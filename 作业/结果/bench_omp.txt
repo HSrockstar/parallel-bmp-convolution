@@ -1,0 +1,153 @@
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp
+Threads         : 4
+---- per-thread compute time ----
+  thread 0                     time =  252.852 ms
+  thread 1                     time =  258.848 ms
+  thread 2                     time =  255.844 ms
+  thread 3                     time =  262.285 ms
+---- timing ----
+Read  time      :     17.067 ms   (serial)
+Conv  time      :    262.372 ms   (parallel region, p=4)
+Conv  sum/thread:   1029.830 ms   (sum of per-thread times)
+Write time      :     11.837 ms   (serial)
+Total time      :    291.280 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp
+Threads         : 4
+---- per-thread compute time ----
+  thread 0                     time =  253.760 ms
+  thread 1                     time =  259.772 ms
+  thread 2                     time =  256.768 ms
+  thread 3                     time =  262.606 ms
+---- timing ----
+Read  time      :     16.557 ms   (serial)
+Conv  time      :    262.685 ms   (parallel region, p=4)
+Conv  sum/thread:   1032.905 ms   (sum of per-thread times)
+Write time      :     11.920 ms   (serial)
+Total time      :    291.164 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp
+Threads         : 4
+---- per-thread compute time ----
+  thread 0                     time =  253.412 ms
+  thread 1                     time =  259.407 ms
+  thread 2                     time =  256.416 ms
+  thread 3                     time =  262.812 ms
+---- timing ----
+Read  time      :     16.027 ms   (serial)
+Conv  time      :    262.899 ms   (parallel region, p=4)
+Conv  sum/thread:   1032.048 ms   (sum of per-thread times)
+Write time      :     11.632 ms   (serial)
+Total time      :    290.562 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp
+Threads         : 4
+---- per-thread compute time ----
+  thread 0                     time =  133.269 ms
+  thread 1                     time =  130.759 ms
+  thread 2                     time =  127.737 ms
+  thread 3                     time =  133.315 ms
+---- timing ----
+Read  time      :     16.777 ms   (serial)
+Conv  time      :    133.451 ms   (parallel region, p=4)
+Conv  sum/thread:    525.080 ms   (sum of per-thread times)
+Write time      :     11.701 ms   (serial)
+Total time      :    161.934 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp
+Threads         : 4
+---- per-thread compute time ----
+  thread 0                     time =  128.139 ms
+  thread 1                     time =  131.832 ms
+  thread 2                     time =  131.793 ms
+  thread 3                     time =  125.135 ms
+---- timing ----
+Read  time      :     16.554 ms   (serial)
+Conv  time      :    131.916 ms   (parallel region, p=4)
+Conv  sum/thread:    516.899 ms   (sum of per-thread times)
+Write time      :     12.172 ms   (serial)
+Total time      :    160.646 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp
+Threads         : 4
+---- per-thread compute time ----
+  thread 0                     time =  127.832 ms
+  thread 1                     time =  131.456 ms
+  thread 2                     time =  131.501 ms
+  thread 3                     time =  127.799 ms
+---- timing ----
+Read  time      :     16.712 ms   (serial)
+Conv  time      :    131.572 ms   (parallel region, p=4)
+Conv  sum/thread:    518.589 ms   (sum of per-thread times)
+Write time      :     12.062 ms   (serial)
+Total time      :    160.350 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp
+Threads         : 4
+---- per-thread compute time ----
+  thread 0                     time =   65.058 ms
+  thread 1                     time =   65.058 ms
+  thread 2                     time =   65.058 ms
+  thread 3                     time =   65.057 ms
+---- timing ----
+Read  time      :     16.082 ms   (serial)
+Conv  time      :     65.163 ms   (parallel region, p=4)
+Conv  sum/thread:    260.231 ms   (sum of per-thread times)
+Write time      :     11.538 ms   (serial)
+Total time      :     92.786 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp
+Threads         : 4
+---- per-thread compute time ----
+  thread 0                     time =   65.063 ms
+  thread 1                     time =   65.063 ms
+  thread 2                     time =   65.063 ms
+  thread 3                     time =   65.062 ms
+---- timing ----
+Read  time      :     17.551 ms   (serial)
+Conv  time      :     65.183 ms   (parallel region, p=4)
+Conv  sum/thread:    260.251 ms   (sum of per-thread times)
+Write time      :     11.565 ms   (serial)
+Total time      :     94.302 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp
+Threads         : 4
+---- per-thread compute time ----
+  thread 0                     time =   65.075 ms
+  thread 1                     time =   65.074 ms
+  thread 2                     time =   65.074 ms
+  thread 3                     time =   65.074 ms
+---- timing ----
+Read  time      :     16.360 ms   (serial)
+Conv  time      :     65.136 ms   (parallel region, p=4)
+Conv  sum/thread:    260.297 ms   (sum of per-thread times)
+Write time      :     11.672 ms   (serial)
+Total time      :     93.170 ms

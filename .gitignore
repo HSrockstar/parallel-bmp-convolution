@@ -1,0 +1,9 @@
+# 编译产物
+作业/代码/conv_pthread
+作业/代码/conv_omp
+作业/代码/*.o
+环境验证/test
+
+# benchmark 中间产物
+作业/结果/bench_blur.bmp
+*.bmp.kernel.txt.tmp
