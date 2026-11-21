@@ -1,0 +1,17 @@
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R3/timg_blur_omp.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R3/timg_blur_omp.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R3/timg_blur_omp.bmp
+Threads         : 4
+---- per-thread compute time ----
+  thread 0                     time =   52.925 ms
+  thread 1                     time =   52.924 ms
+  thread 2                     time =   52.924 ms
+  thread 3                     time =   52.925 ms
+---- timing ----
+Read  time      :      9.017 ms   (serial)
+Conv  time      :     53.041 ms   (parallel region, p=4)
+Conv  sum/thread:    211.698 ms   (sum of per-thread times)
+Write time      :      8.009 ms   (serial)
+Total time      :     70.072 ms

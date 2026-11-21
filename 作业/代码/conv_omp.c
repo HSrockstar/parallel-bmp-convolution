@@ -108,6 +108,32 @@ static int bmp_write(const char *path, const Image *img)
 }
 
 /* ---------------- OpenMP 并行卷积 ---------------- */
+/* R3: 边界像素慢路径——带 sx/sy 越界检查（常数 0 填充），仅用于图像四周 2 圈 */
+static inline void conv_pixel_guarded(const uint8_t *src, uint8_t *dst,
+                                      int w, int h, int stride, int y, int x)
+{
+    double a0 = 0.0, a1 = 0.0, a2 = 0.0;
+    for (int ky = 0; ky < KSIZE; ky++) {
+        int sy = y + ky - KRAD;
+        if (sy < 0 || sy >= h) continue;
+        const uint8_t *srow = src + (size_t)sy * stride;
+        for (int kx = 0; kx < KSIZE; kx++) {
+            int sx = x + kx - KRAD;
+            if (sx < 0 || sx >= w) continue;
+            double kv = g_kernel[ky][kx];
+            const uint8_t *p = srow + sx * 3;
+            a0 += kv * p[0];
+            a1 += kv * p[1];
+            a2 += kv * p[2];
+        }
+    }
+    uint8_t *d = dst + (size_t)y * stride + x * 3;
+    int v0 = (int)(a0 + 0.5), v1 = (int)(a1 + 0.5), v2 = (int)(a2 + 0.5);
+    d[0] = v0 < 0 ? 0 : (v0 > 255 ? 255 : v0);
+    d[1] = v1 < 0 ? 0 : (v1 > 255 ? 255 : v1);
+    d[2] = v2 < 0 ? 0 : (v2 > 255 ? 255 : v2);
+}
+
 /* 返回并行区墙钟时间（ms），thread_ms 带回各线程运算时间 */
 static double conv_all(const Image *img, Image *out, double *thread_ms)
 {
@@ -122,27 +148,40 @@ static double conv_all(const Image *img, Image *out, double *thread_ms)
         double ts = omp_get_wtime();
         #pragma omp for schedule(static)      /* 按行静态划分，各线程互不重叠 */
         for (int y = 0; y < h; y++) {
-            for (int x = 0; x < w; x++) {
-                double acc[3] = {0.0, 0.0, 0.0};
-                for (int ky = 0; ky < KSIZE; ky++) {
-                    int sy = y + ky - KRAD;
-                    if (sy < 0 || sy >= h) continue;        /* 常数 0 填充 */
-                    const uint8_t *srow = src + (size_t)sy * stride;
-                    for (int kx = 0; kx < KSIZE; kx++) {
-                        int sx = x + kx - KRAD;
-                        if (sx < 0 || sx >= w) continue;    /* 常数 0 填充 */
-                        double kv = g_kernel[ky][kx];
-                        const uint8_t *p = srow + sx * 3;
-                        acc[0] += kv * p[0];
-                        acc[1] += kv * p[1];
-                        acc[2] += kv * p[2];
+            if (w > 2 * KRAD) {
+                for (int x = 0; x < KRAD; x++)
+                    conv_pixel_guarded(src, dst, w, h, stride, y, x);
+                for (int x = w - KRAD; x < w; x++)
+                    conv_pixel_guarded(src, dst, w, h, stride, y, x);
+            } else {
+                for (int x = 0; x < w; x++)
+                    conv_pixel_guarded(src, dst, w, h, stride, y, x);
+                continue;
+            }
+
+            if (y >= KRAD && y < h - KRAD) {
+                /* R3: 内部行主循环——无任何越界分支，独立标量累加器驻留寄存器 */
+                for (int x = KRAD; x < w - KRAD; x++) {
+                    double a0 = 0.0, a1 = 0.0, a2 = 0.0;
+                    for (int ky = 0; ky < KSIZE; ky++) {
+                        const uint8_t *srow = src
+                            + (size_t)(y + ky - KRAD) * stride + (size_t)(x - KRAD) * 3;
+                        for (int kx = 0; kx < KSIZE; kx++) {
+                            const double kv = g_kernel[ky][kx];
+                            a0 += kv * srow[kx * 3 + 0];
+                            a1 += kv * srow[kx * 3 + 1];
+                            a2 += kv * srow[kx * 3 + 2];
+                        }
                     }
+                    uint8_t *d = dst + (size_t)y * stride + x * 3;
+                    int v0 = (int)(a0 + 0.5), v1 = (int)(a1 + 0.5), v2 = (int)(a2 + 0.5);
+                    d[0] = v0 < 0 ? 0 : (v0 > 255 ? 255 : v0);
+                    d[1] = v1 < 0 ? 0 : (v1 > 255 ? 255 : v1);
+                    d[2] = v2 < 0 ? 0 : (v2 > 255 ? 255 : v2);
                 }
-                uint8_t *d = dst + (size_t)y * stride + x * 3;
-                for (int c = 0; c < 3; c++) {
-                    int v = (int)(acc[c] + 0.5);            /* 四舍五入 */
-                    d[c] = v < 0 ? 0 : (v > 255 ? 255 : v);
-                }
+            } else {
+                for (int x = KRAD; x < w - KRAD; x++)
+                    conv_pixel_guarded(src, dst, w, h, stride, y, x);
             }
         }
         thread_ms[tid] = (omp_get_wtime() - ts) * 1000.0;
