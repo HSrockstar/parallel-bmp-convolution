@@ -35,6 +35,7 @@
 #include <math.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <sys/mman.h>
 
 #define KSIZE 5
 #define KRAD  2                     /* (KSIZE-1)/2 */
@@ -114,14 +115,15 @@ static void bmp_make_header(const BmpInfo *b, uint8_t hdr[54])
 typedef struct {
     int tid;
     int y0, y1;              /* 该线程负责的输出行范围 [y0, y1) */
-    double read_ms;          /* 该线程读源条带（含 halo）时间 */
-    double conv_ms;          /* 该线程卷积（并行段）时间 */
-    double write_ms;         /* 该线程写输出条带时间 */
+    double conv_ms;          /* 该线程卷积（并行段，含输入/输出映射按需缺页）时间 */
 } ThreadArg;
 
 static BmpInfo g_bmp;                   /* 图像几何，线程只读 */
 static int g_in_fd = -1, g_out_fd = -1;
-static uint8_t *g_out;                  /* 整图输出缓冲（条带互不重叠） */
+static uint8_t *g_in_map;               /* R8: 输入文件 mmap 基址 */
+static uint8_t *g_out_map;              /* R8: 输出文件 mmap 基址 */
+static size_t g_out_mapsize;
+static uint8_t *g_out;                  /* 输出像素区（= g_out_map + data_off，条带互不重叠） */
 
 /* 水平趟：srow==NULL 表示越界行，H 置零（常数 0 填充） */
 static void hpass(float *dst, const uint8_t *srow, int w)
@@ -200,34 +202,15 @@ static void *thread_main(void *p)
     const int w = g_bmp.w, h = g_bmp.h, stride = g_bmp.stride;
     int y0 = arg->y0, y1 = arg->y1;
 
-    /* R5: 逐条带 pread → conv → pwrite，I/O 与其他线程的计算重叠 */
+    /* R8: 源条带直接取输入文件映射（按需缺页，免 pread 拷贝与条带缓冲）；
+     * 输出直接写输出文件映射（免 pwrite 拷贝，脏页由内核在退出时回写） */
     int y0c = y0 - KRAD < 0 ? 0 : y0 - KRAD;      /* 含上 halo 的读取范围 */
     int y1c = y1 + KRAD > h ? h : y1 + KRAD;
-    size_t band_bytes = (size_t)(y1c - y0c) * stride;
-    uint8_t *src = malloc(band_bytes);
-    if (!src) return NULL;
+    const uint8_t *src = g_in_map + g_bmp.data_off + (size_t)y0c * stride;
 
     double t0 = now_sec();
-    if (pread(g_in_fd, src, band_bytes, g_bmp.data_off + (off_t)y0c * stride)
-        != (ssize_t)band_bytes) {
-        fprintf(stderr, "thread %d: pread source band failed\n", arg->tid);
-        free(src);
-        return NULL;
-    }
-    arg->read_ms = (now_sec() - t0) * 1000.0;
-
-    t0 = now_sec();
     conv_band(src, y0c, y1c - y0c, g_out, w, stride, y0, y1);
     arg->conv_ms = (now_sec() - t0) * 1000.0;
-
-    t0 = now_sec();
-    if (pwrite(g_out_fd, g_out + (size_t)y0 * stride,
-               (size_t)(y1 - y0) * stride,
-               g_bmp.data_off + (off_t)y0 * stride) < 0)
-        fprintf(stderr, "thread %d: pwrite output band failed\n", arg->tid);
-    arg->write_ms = (now_sec() - t0) * 1000.0;
-
-    free(src);
     return NULL;
 }
 
@@ -296,7 +279,7 @@ int main(int argc, char **argv)
 
     double t_all0 = now_sec();
 
-    /* 1. 解析 BMP 头（不读像素——像素由各线程按条带 pread） */
+    /* 1. 解析 BMP 头 + mmap 输入文件（像素按需缺页，免整图读拷贝） */
     g_in_fd = open(in_path, O_RDONLY);
     if (g_in_fd < 0) { fprintf(stderr, "cannot open %s\n", in_path); return 1; }
     uint8_t hdr[54];
@@ -306,24 +289,34 @@ int main(int argc, char **argv)
         return 1;
     }
     const int w = g_bmp.w, h = g_bmp.h, stride = g_bmp.stride;
+    off_t in_size = lseek(g_in_fd, 0, SEEK_END);
+    g_in_map = mmap(NULL, (size_t)in_size, PROT_READ, MAP_SHARED, g_in_fd, 0);
+    if (g_in_map == MAP_FAILED) { fprintf(stderr, "mmap input failed\n"); return 1; }
 
-    g_out = malloc((size_t)stride * h);
-    if (!g_out) { fprintf(stderr, "out of memory\n"); return 1; }
-    {   /* 行尾填充字节清零（本实验图片 padlen=0，通用性保险） */
+    /* 2. 创建输出文件：ftruncate 定长 + 写头 + MAP_SHARED 映射，
+     *    卷积结果直接写入映射（免 malloc 输出缓冲与 pwrite 拷贝） */
+    uint8_t ohdr[54];
+    bmp_make_header(&g_bmp, ohdr);
+    g_out_fd = open(out_path, O_RDWR | O_CREAT | O_TRUNC, 0644);
+    if (g_out_fd < 0) { fprintf(stderr, "cannot create %s\n", out_path); return 1; }
+    g_out_mapsize = (size_t)g_bmp.data_off + (size_t)stride * h;
+    if (ftruncate(g_out_fd, (off_t)g_out_mapsize) != 0) {
+        fprintf(stderr, "ftruncate failed\n"); return 1;
+    }
+    if (pwrite(g_out_fd, ohdr, 54, 0) != 54) { fprintf(stderr, "write header failed\n"); return 1; }
+    g_out_map = mmap(NULL, g_out_mapsize, PROT_READ | PROT_WRITE, MAP_SHARED, g_out_fd, 0);
+    if (g_out_map == MAP_FAILED) { fprintf(stderr, "mmap output failed\n"); return 1; }
+    g_out = g_out_map + g_bmp.data_off;
+    {   /* 头部与像素区之间的间隙及行尾填充字节清零（本实验图片均为 0，通用性保险） */
         int padlen = stride - w * 3;
+        if (g_bmp.data_off > 54)
+            memset(g_out_map + 54, 0, (size_t)g_bmp.data_off - 54);
         if (padlen)
             for (int y = 0; y < h; y++)
                 memset(g_out + (size_t)y * stride + w * 3, 0, (size_t)padlen);
     }
 
-    /* 2. 创建输出文件并写头（各条带 pwrite 到各自偏移） */
-    uint8_t ohdr[54];
-    bmp_make_header(&g_bmp, ohdr);
-    g_out_fd = open(out_path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-    if (g_out_fd < 0) { fprintf(stderr, "cannot create %s\n", out_path); return 1; }
-    if (pwrite(g_out_fd, ohdr, 54, 0) != 54) { fprintf(stderr, "write header failed\n"); return 1; }
-
-    /* 3. 并行：每线程 pread 条带 → 卷积 → pwrite 条带（R5 流水线） */
+    /* 3. 并行：各线程在自己的条带上卷积（源/目的均为文件映射） */
     if (nthreads > h) nthreads = h;
     ThreadArg *args = calloc((size_t)nthreads, sizeof(ThreadArg));
     pthread_t *tids  = calloc((size_t)nthreads, sizeof(pthread_t));
@@ -351,25 +344,22 @@ int main(int argc, char **argv)
     printf("Input           : %s (%d x %d, 24bpp, stride=%d)\n", in_path, w, h, stride);
     printf("Output BMP      : %s\n", out_path);
     printf("Threads         : %d\n", nthreads);
-    printf("---- per-thread time (read band / conv / write band) ----\n");
-    double max_read = 0, max_conv = 0, max_write = 0, sum_conv = 0;
+    printf("---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----\n");
+    double max_conv = 0, sum_conv = 0;
     for (int i = 0; i < nthreads; i++) {
-        printf("  thread %-2d rows [%5d,%5d)  read = %7.3f  conv = %8.3f  write = %7.3f ms\n",
-               args[i].tid, args[i].y0, args[i].y1,
-               args[i].read_ms, args[i].conv_ms, args[i].write_ms);
-        if (args[i].read_ms  > max_read)  max_read  = args[i].read_ms;
-        if (args[i].conv_ms  > max_conv)  max_conv  = args[i].conv_ms;
-        if (args[i].write_ms > max_write) max_write = args[i].write_ms;
+        printf("  thread %-2d rows [%5d,%5d)  conv = %8.3f ms\n",
+               args[i].tid, args[i].y0, args[i].y1, args[i].conv_ms);
+        if (args[i].conv_ms > max_conv) max_conv = args[i].conv_ms;
         sum_conv += args[i].conv_ms;
     }
-    printf("---- timing (R5: per-band I/O overlapped with compute) ----\n");
-    printf("Band read  (critical, max over threads): %8.3f ms\n", max_read);
-    printf("Conv       (parallel region, p=%d)     : %8.3f ms   (critical path = max thread)\n", nthreads, max_conv);
-    printf("Conv       sum/thread                 : %8.3f ms   (sum of per-thread times)\n", sum_conv);
-    printf("Band write (critical, max over threads): %8.3f ms\n", max_write);
+    printf("---- timing ----\n");
+    printf("I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）\n");
+    printf("Conv   : (parallel region, p=%d)  %8.3f ms   (critical path = max thread)\n", nthreads, max_conv);
+    printf("Conv   : sum/thread              %8.3f ms   (sum of per-thread times)\n", sum_conv);
     printf("Total time      : %10.3f ms\n", total_ms);
 
     free(args); free(tids);
-    free(g_out);
+    munmap(g_out_map, g_out_mapsize);
+    munmap(g_in_map, (size_t)in_size);
     return 0;
 }
