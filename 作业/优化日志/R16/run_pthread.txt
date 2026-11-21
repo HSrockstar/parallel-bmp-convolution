@@ -1,0 +1,16 @@
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R16/timg_blur_pthread.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R16/timg_blur_pthread.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R16/timg_blur_pthread.bmp
+Threads         : 4
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0  rows [    0,  576)  conv =    8.370 ms
+  thread 1  rows [  576, 1152)  conv =    8.007 ms
+  thread 2  rows [ 1152, 1728)  conv =    8.299 ms
+  thread 3  rows [ 1728, 2304)  conv =    8.212 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=4)     8.370 ms   (critical path = max thread)
+Conv   : sum/thread                32.887 ms   (sum of per-thread times)
+Total time      :     11.112 ms

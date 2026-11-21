@@ -20,6 +20,10 @@
  *      水平趟 5 行环形缓冲驻 L2 + 垂直趟连续 double 累加，每像素乘加 75→30
  *   R5 I/O 与计算重叠：每线程 pread 自己的源条带（含上下 halo）→ 卷积 →
  *      pwrite 自己的输出条带，四线程 I/O/计算流水线化，消除串行整图读写
+ *   R14 vpass 单趟融合：每 x 一次算完垂直 5 tap（5 load + 4 FMA + 1 store），
+ *      免 vbuf 4 次读改写整平面往返（T4 −18%；插桩实测 vpass 占纯计算 49%）
+ *   R15 hpass 单趟融合：内部区 5 tap 单趟算完（与 R14 同构），边缘 4 列走
+ *      逐 tap 旧路径，窄图（w≤4）保留原实现（T4 再 −2.8%）
  *
  * 计时：clock_gettime(CLOCK_MONOTONIC) 计全程墙钟；逐线程打印
  *       读条带/卷积（并行段）/写条带分段耗时，并行段关键路径 = max(各线程卷积时间)。
@@ -136,7 +140,46 @@ static void hpass3(float *dst3, const uint8_t *srow, uint8_t *scratch3, int w)
         scratch3[w + x]     = srow[(size_t)x * 3 + 1];
         scratch3[2 * w + x] = srow[(size_t)x * 3 + 2];
     }
-    /* R10: kx=0 首趟直接写（免整平面 memset）；其左边界 2 列无贡献，显式置零 */
+    if (w > 2 * KRAD) {
+        /* R15: 内部区 [KRAD, w-KRAD) 单趟融合 —— 每 x 一次算完 5 tap
+         * （5 u8 load + cvt + 4 FMA + 1 store），免 H 平面 4 次读改写
+         * 整平面往返（与 R14 的 vpass 同构）。求和左结合次序与原实现一致。 */
+        const float k0 = g_k1[0], k1 = g_k1[1], k2 = g_k1[2],
+                    k3 = g_k1[3], k4 = g_k1[4];
+        for (int c = 0; c < 3; c++) {
+            const uint8_t *s = scratch3 + (size_t)c * w;
+            float *d = dst3 + (size_t)c * w;
+            for (int x = KRAD; x < w - KRAD; x++)
+                d[x] = k0 * (float)s[x - 2] + k1 * (float)s[x - 1]
+                     + k2 * (float)s[x]     + k3 * (float)s[x + 1]
+                     + k4 * (float)s[x + 2];
+        }
+        /* 边缘各 2 列：tap 有效区间不同，逐 tap 累加（kx 升序，次序不变） */
+        for (int kx = 0; kx < KSIZE; kx++) {
+            const float kv = g_k1[kx];
+            int x0 = KRAD - kx;
+            if (x0 < 0) x0 = 0;
+            int x1 = w + KRAD - kx;
+            if (x1 > w) x1 = w;
+            for (int c = 0; c < 3; c++) {
+                const uint8_t *s = scratch3 + (size_t)c * w + (kx - KRAD);
+                float *d = dst3 + (size_t)c * w;
+                if (kx == 0) {
+                    for (int x = 0; x < KRAD; x++)
+                        d[x] = 0.0f;             /* 左边界无贡献，显式置零 */
+                    for (int x = w - KRAD; x < x1; x++)
+                        d[x] = kv * (float)s[x];
+                } else {
+                    for (int x = x0; x < KRAD && x < x1; x++)
+                        d[x] += kv * (float)s[x];
+                    for (int x = (w - KRAD > x0 ? w - KRAD : x0); x < x1; x++)
+                        d[x] += kv * (float)s[x];
+                }
+            }
+        }
+        return;
+    }
+    /* 窄图（w ≤ 4，内部区为空）：逐 tap 有效区间累加，与 R10 行为一致 */
     {
         const float kv0 = g_k1[0];
         for (int c = 0; c < 3; c++) {
@@ -186,20 +229,23 @@ static void conv_band(const uint8_t *src, int base, int nrows,
                sp, w);
     }
     for (int y = y0; y < y1; y++) {
-        /* 垂直趟：v[c] = Σ_ky k1[ky]·H(y+ky-2)[c]，每通道连续累加；
-         * 首趟直接写，替代 memset */
+        /* 垂直趟：v[c] = Σ_ky k1[ky]·H(y+ky-2)[c]。
+         * R14: 单趟融合 —— 每 x 一次算完 5 tap（5 load + 4 FMA + 1 store），
+         * 免去 vbuf 4 次"读-改-写"整平面往返（每行 48KB×4 的 L1 流量；
+         * 插桩实测 vpass 占纯计算 49%，为此轮主攻）。求和保持左结合，
+         * 与原 5 次累加逐位一致。 */
         for (int c = 0; c < 3; c++) {
             float *v = vbuf + c * pw;
             const float *h0 = hb + ((size_t)slot5(y - KRAD) * 3 + c) * pw;
-            const float kv0 = g_k1[0];
+            const float *h1 = hb + ((size_t)slot5(y - KRAD + 1) * 3 + c) * pw;
+            const float *h2 = hb + ((size_t)slot5(y - KRAD + 2) * 3 + c) * pw;
+            const float *h3 = hb + ((size_t)slot5(y - KRAD + 3) * 3 + c) * pw;
+            const float *h4 = hb + ((size_t)slot5(y - KRAD + 4) * 3 + c) * pw;
+            const float k0 = g_k1[0], k1 = g_k1[1], k2 = g_k1[2],
+                        k3 = g_k1[3], k4 = g_k1[4];
             for (size_t x = 0; x < pw; x++)
-                v[x] = kv0 * h0[x];
-            for (int ky = 1; ky < KSIZE; ky++) {
-                const float *hr = hb + ((size_t)slot5(y + ky - KRAD) * 3 + c) * pw;
-                const float kv = g_k1[ky];
-                for (size_t x = 0; x < pw; x++)
-                    v[x] += kv * hr[x];
-            }
+                v[x] = k0 * h0[x] + k1 * h1[x] + k2 * h2[x]
+                     + k3 * h3[x] + k4 * h4[x];
         }
         /* pack：3 平面 → 舍入饱和 → 交错 uint8 写回 */
         uint8_t *d = dst + (size_t)y * stride;

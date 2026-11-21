@@ -5,7 +5,9 @@
  *       步长 1、边缘常数 0 填充做卷积，输出模糊后的 BMP；并用 OpenMP 按行分条带并行。
  *
  * 用法: ./conv_omp <input.bmp> <output.bmp> [threads] [--dump-full]
- *   threads      线程数，默认 4（也可用环境变量 OMP_NUM_THREADS 控制）
+ *   threads      线程数；未指定时尊重 OMP_NUM_THREADS 环境变量，
+ *                环境变量也未设则用 OpenMP 默认（通常 = 可用核数）。
+ *                显式传参 > OMP_NUM_THREADS > 系统默认。
  *   --dump-full  将卷积后的完整像素矩阵写入 txt（大图会很大，默认只导出局部供验证）
  *
  * 输出文件：
@@ -20,11 +22,17 @@
  *      水平趟 5 行环形缓冲驻 L2 + 垂直趟连续 double 累加，每像素乘加 75→30
  *   R5 I/O 与计算重叠：每线程 pread 自己的源条带（含上下 halo）→ 卷积 →
  *      pwrite 自己的输出条带，各线程 I/O/计算流水线化，消除串行整图读写
+ *   R14 vpass 单趟融合：每 x 一次算完垂直 5 tap（5 load + 4 FMA + 1 store），
+ *      免 vbuf 4 次读改写整平面往返（T4 −18%；插桩实测 vpass 占纯计算 49%）
+ *   R15 hpass 单趟融合：内部区 5 tap 单趟算完（与 R14 同构），边缘 4 列走
+ *      逐 tap 旧路径，窄图（w≤4）保留原实现（T4 再 −2.8%）
  *
  * 计时：omp_get_wtime 计全程墙钟；逐线程打印读条带/卷积（并行段）/写条带
  *       分段耗时，并行段关键路径 = max(各线程卷积时间)。
+ *       线程数：显式传参 > OMP_NUM_THREADS > OpenMP 默认（打印实际值）。
  */
 #define _POSIX_C_SOURCE 200809L   /* mmap/pread/pwrite */
+#define _DEFAULT_SOURCE            /* madvise / MADV_SEQUENTIAL */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -108,7 +116,46 @@ static void hpass3(float *dst3, const uint8_t *srow, uint8_t *scratch3, int w)
         scratch3[w + x]     = srow[(size_t)x * 3 + 1];
         scratch3[2 * w + x] = srow[(size_t)x * 3 + 2];
     }
-    /* R10: kx=0 首趟直接写（免整平面 memset）；其左边界 2 列无贡献，显式置零 */
+    if (w > 2 * KRAD) {
+        /* R15: 内部区 [KRAD, w-KRAD) 单趟融合 —— 每 x 一次算完 5 tap
+         * （5 u8 load + cvt + 4 FMA + 1 store），免 H 平面 4 次读改写
+         * 整平面往返（与 R14 的 vpass 同构）。求和左结合次序与原实现一致。 */
+        const float k0 = g_k1[0], k1 = g_k1[1], k2 = g_k1[2],
+                    k3 = g_k1[3], k4 = g_k1[4];
+        for (int c = 0; c < 3; c++) {
+            const uint8_t *s = scratch3 + (size_t)c * w;
+            float *d = dst3 + (size_t)c * w;
+            for (int x = KRAD; x < w - KRAD; x++)
+                d[x] = k0 * (float)s[x - 2] + k1 * (float)s[x - 1]
+                     + k2 * (float)s[x]     + k3 * (float)s[x + 1]
+                     + k4 * (float)s[x + 2];
+        }
+        /* 边缘各 2 列：tap 有效区间不同，逐 tap 累加（kx 升序，次序不变） */
+        for (int kx = 0; kx < KSIZE; kx++) {
+            const float kv = g_k1[kx];
+            int x0 = KRAD - kx;
+            if (x0 < 0) x0 = 0;
+            int x1 = w + KRAD - kx;
+            if (x1 > w) x1 = w;
+            for (int c = 0; c < 3; c++) {
+                const uint8_t *s = scratch3 + (size_t)c * w + (kx - KRAD);
+                float *d = dst3 + (size_t)c * w;
+                if (kx == 0) {
+                    for (int x = 0; x < KRAD; x++)
+                        d[x] = 0.0f;             /* 左边界无贡献，显式置零 */
+                    for (int x = w - KRAD; x < x1; x++)
+                        d[x] = kv * (float)s[x];
+                } else {
+                    for (int x = x0; x < KRAD && x < x1; x++)
+                        d[x] += kv * (float)s[x];
+                    for (int x = (w - KRAD > x0 ? w - KRAD : x0); x < x1; x++)
+                        d[x] += kv * (float)s[x];
+                }
+            }
+        }
+        return;
+    }
+    /* 窄图（w ≤ 4，内部区为空）：逐 tap 有效区间累加，与 R10 行为一致 */
     {
         const float kv0 = g_k1[0];
         for (int c = 0; c < 3; c++) {
@@ -154,20 +201,23 @@ static void conv_band(const uint8_t *src, int base, int nrows,
                sp, w);
     }
     for (int y = y0; y < y1; y++) {
-        /* 垂直趟：v[c] = Σ_ky k1[ky]·H(y+ky-2)[c]，每通道连续累加；
-         * 首趟直接写，替代 memset */
+        /* 垂直趟：v[c] = Σ_ky k1[ky]·H(y+ky-2)[c]。
+         * R14: 单趟融合 —— 每 x 一次算完 5 tap（5 load + 4 FMA + 1 store），
+         * 免去 vbuf 4 次"读-改-写"整平面往返（每行 48KB×4 的 L1 流量；
+         * 插桩实测 vpass 占纯计算 49%，为此轮主攻）。求和保持左结合，
+         * 与原 5 次累加逐位一致。 */
         for (int c = 0; c < 3; c++) {
             float *v = vbuf + c * pw;
             const float *h0 = hb + ((size_t)slot5(y - KRAD) * 3 + c) * pw;
-            const float kv0 = g_k1[0];
+            const float *h1 = hb + ((size_t)slot5(y - KRAD + 1) * 3 + c) * pw;
+            const float *h2 = hb + ((size_t)slot5(y - KRAD + 2) * 3 + c) * pw;
+            const float *h3 = hb + ((size_t)slot5(y - KRAD + 3) * 3 + c) * pw;
+            const float *h4 = hb + ((size_t)slot5(y - KRAD + 4) * 3 + c) * pw;
+            const float k0 = g_k1[0], k1 = g_k1[1], k2 = g_k1[2],
+                        k3 = g_k1[3], k4 = g_k1[4];
             for (size_t x = 0; x < pw; x++)
-                v[x] = kv0 * h0[x];
-            for (int ky = 1; ky < KSIZE; ky++) {
-                const float *hr = hb + ((size_t)slot5(y + ky - KRAD) * 3 + c) * pw;
-                const float kv = g_k1[ky];
-                for (size_t x = 0; x < pw; x++)
-                    v[x] += kv * hr[x];
-            }
+                v[x] = k0 * h0[x] + k1 * h1[x] + k2 * h2[x]
+                     + k3 * h3[x] + k4 * h4[x];
         }
         /* pack：3 平面 → 舍入饱和 → 交错 uint8 写回 */
         uint8_t *d = dst + (size_t)y * stride;
@@ -242,14 +292,16 @@ int main(int argc, char **argv)
     }
     const char *in_path  = argv[1];
     const char *out_path = argv[2];
-    int nthreads = 4;
+    int nthreads = 0;      /* 0 = 未显式指定 → 尊重 OMP_NUM_THREADS / 系统默认。
+                            * 修复记录：此前默认 4 且无条件 omp_set_num_threads(4)，
+                            * 会覆盖 OMP_NUM_THREADS 环境变量，导致基准脚本
+                            * "1/2 核"组实际跑的是 4 线程挤 1/2 核。 */
     int dump_full = 0;
     for (int i = 3; i < argc; i++) {
         if (strcmp(argv[i], "--dump-full") == 0) dump_full = 1;
-        else nthreads = atoi(argv[i]);
+        else if (atoi(argv[i]) > 0) nthreads = atoi(argv[i]);
     }
-    if (nthreads < 1) nthreads = 1;
-    omp_set_num_threads(nthreads);
+    if (nthreads > 0) omp_set_num_threads(nthreads);
 
     double t_all0 = omp_get_wtime();
 
@@ -292,14 +344,15 @@ int main(int argc, char **argv)
     }
 
     /* 3. 并行：各线程在自己的条带上卷积（源/目的均为文件映射） */
-    int nth = nthreads > h ? h : nthreads;
     int maxt = omp_get_max_threads();
     double *conv_ms = calloc((size_t)maxt, sizeof(double));
+    int np_actual = 0;                        /* 并行区实际线程数（用于打印） */
 
     #pragma omp parallel
     {
         int tid = omp_get_thread_num();
         int np  = omp_get_num_threads();
+        if (tid == 0) np_actual = np;
         int chunk = (h + np - 1) / np;
         int y0 = tid * chunk;
         int y1 = y0 + chunk;
@@ -328,17 +381,18 @@ int main(int argc, char **argv)
     printf("================ OpenMP BMP Gaussian Convolution ==================\n");
     printf("Input           : %s (%d x %d, 24bpp, stride=%d)\n", in_path, w, h, stride);
     printf("Output BMP      : %s\n", out_path);
-    printf("Threads         : %d\n", nthreads);
+    printf("Threads         : %d%s\n", np_actual,
+           nthreads > 0 ? "" : " (OMP_NUM_THREADS / default)");
     printf("---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----\n");
     double max_conv = 0, sum_conv = 0;
-    for (int i = 0; i < nth; i++) {
+    for (int i = 0; i < np_actual; i++) {
         printf("  thread %-2d                    conv = %8.3f ms\n", i, conv_ms[i]);
         if (conv_ms[i] > max_conv) max_conv = conv_ms[i];
         sum_conv += conv_ms[i];
     }
     printf("---- timing ----\n");
     printf("I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）\n");
-    printf("Conv   : (parallel region, p=%d)  %8.3f ms   (critical path = max thread)\n", nth, max_conv);
+    printf("Conv   : (parallel region, p=%d)  %8.3f ms   (critical path = max thread)\n", np_actual, max_conv);
     printf("Conv   : sum/thread              %8.3f ms   (sum of per-thread times)\n", sum_conv);
     printf("Total time      : %10.3f ms\n", total_ms);
 
