@@ -34,10 +34,14 @@ static const double g_kernel[KSIZE][KSIZE] = {
 };
 
 /* ---------------- BMP 读写 ---------------- */
+/* R2 优化：像素数据按文件原始行序直接读入最终缓冲（免 28MB 翻转拷贝），写图单次 fwrite。
+ * 卷积核垂直方向对称 ⇒ 对"上下翻转的图"直接卷积 = 卷积结果上下翻转，
+ * 因此无论缓冲是自下而上还是自上而下行序，用同一个卷积公式原地算即可，结果等价。 */
 typedef struct {
-    int w, h;                /* 图像宽、高（行序已在内存里转为自上而下） */
-    int stride;              /* BMP 文件中每行字节数（4 字节对齐） */
-    uint8_t *data;           /* 顶层像素，BGR 交错，data[(y*w + x)*3 + c] */
+    int w, h;                /* 图像宽、高 */
+    int stride;              /* 每行字节数（4 字节对齐，含尾部填充） */
+    int topdown;             /* 1: data 行序自上而下（文件负高度）；0: 自下而上 */
+    uint8_t *data;           /* 像素，BGR 交错，行 r 首地址 = data + r*stride */
 } Image;
 
 static int bmp_read(const char *path, Image *img)
@@ -65,42 +69,32 @@ static int bmp_read(const char *path, Image *img)
 
     int h = hraw > 0 ? hraw : -hraw;
     int stride = (w * 3 + 3) & ~3;
-    uint8_t *raw = malloc((size_t)stride * h);
-    if (!raw) { fclose(fp); return -1; }
+    img->w = w; img->h = h; img->stride = stride;
+    img->topdown = (hraw < 0);
+    img->data = malloc((size_t)stride * h);        /* 一步到位，无中间缓冲 */
+    if (!img->data) { fclose(fp); return -1; }
     fseek(fp, off, SEEK_SET);
-    if (fread(raw, 1, (size_t)stride * h, fp) != (size_t)stride * h) {
+    if (fread(img->data, 1, (size_t)stride * h, fp) != (size_t)stride * h) {
         fprintf(stderr, "%s: pixel data truncated\n", path);
-        free(raw); fclose(fp);
+        free(img->data); fclose(fp);
         return -1;
     }
     fclose(fp);
-
-    /* 存成自上而下：BMP 第 0 行是图像最底行 */
-    img->w = w; img->h = h; img->stride = stride;
-    img->data = malloc((size_t)w * h * 3);
-    if (!img->data) { free(raw); return -1; }
-    for (int y = 0; y < h; y++) {
-        const uint8_t *src = raw + (size_t)y * stride;
-        uint8_t *dst = img->data + (size_t)(h - 1 - y) * w * 3;
-        memcpy(dst, src, (size_t)w * 3);
-    }
-    free(raw);
     return 0;
 }
 
 static int bmp_write(const char *path, const Image *img)
 {
-    int w = img->w, h = img->h;
-    int stride = (w * 3 + 3) & ~3;
-    uint32_t datasize = (uint32_t)stride * h;
+    int h = img->h;
+    uint32_t datasize = (uint32_t)img->stride * h;
 
     uint8_t hdr[54] = {0};
     hdr[0] = 'B'; hdr[1] = 'M';
     *(uint32_t *)&hdr[2]  = 54 + datasize;   /* bfSize */
     *(uint32_t *)&hdr[10] = 54;              /* bfOffBits */
     *(uint32_t *)&hdr[14] = 40;              /* biSize = BITMAPINFOHEADER */
-    *(int32_t  *)&hdr[18] = w;
-    *(int32_t  *)&hdr[22] = h;               /* 正数：自下而上存储 */
+    *(int32_t  *)&hdr[18] = img->w;
+    *(int32_t  *)&hdr[22] = img->topdown ? -h : h;  /* 与输入同向，保证不镜像 */
     *(uint16_t *)&hdr[26] = 1;               /* biPlanes */
     *(uint16_t *)&hdr[28] = 24;              /* biBitCount */
     *(uint32_t *)&hdr[34] = datasize;        /* biSizeImage */
@@ -108,13 +102,7 @@ static int bmp_write(const char *path, const Image *img)
     FILE *fp = fopen(path, "wb");
     if (!fp) { fprintf(stderr, "cannot create %s\n", path); return -1; }
     fwrite(hdr, 1, 54, fp);
-
-    uint8_t pad[3] = {0, 0, 0};
-    int padlen = stride - w * 3;
-    for (int y = h - 1; y >= 0; y--) {       /* 自下而上写回 */
-        fwrite(img->data + (size_t)y * w * 3, 1, (size_t)w * 3, fp);
-        if (padlen) fwrite(pad, 1, (size_t)padlen, fp);
-    }
+    fwrite(img->data, 1, datasize, fp);      /* R2: 整块单次写（原为逐行 h 次 fwrite） */
     fclose(fp);
     return 0;
 }
@@ -123,7 +111,7 @@ static int bmp_write(const char *path, const Image *img)
 /* 返回并行区墙钟时间（ms），thread_ms 带回各线程运算时间 */
 static double conv_all(const Image *img, Image *out, double *thread_ms)
 {
-    const int w = img->w, h = img->h;
+    const int w = img->w, h = img->h, stride = img->stride;
     const uint8_t *src = img->data;
     uint8_t *dst = out->data;
 
@@ -139,7 +127,7 @@ static double conv_all(const Image *img, Image *out, double *thread_ms)
                 for (int ky = 0; ky < KSIZE; ky++) {
                     int sy = y + ky - KRAD;
                     if (sy < 0 || sy >= h) continue;        /* 常数 0 填充 */
-                    const uint8_t *srow = src + (size_t)sy * w * 3;
+                    const uint8_t *srow = src + (size_t)sy * stride;
                     for (int kx = 0; kx < KSIZE; kx++) {
                         int sx = x + kx - KRAD;
                         if (sx < 0 || sx >= w) continue;    /* 常数 0 填充 */
@@ -150,7 +138,7 @@ static double conv_all(const Image *img, Image *out, double *thread_ms)
                         acc[2] += kv * p[2];
                     }
                 }
-                uint8_t *d = dst + ((size_t)y * w + x) * 3;
+                uint8_t *d = dst + (size_t)y * stride + x * 3;
                 for (int c = 0; c < 3; c++) {
                     int v = (int)(acc[c] + 0.5);            /* 四舍五入 */
                     d[c] = v < 0 ? 0 : (v > 255 ? 255 : v);
@@ -194,9 +182,10 @@ static void dump_matrix(const char *base, const Image *img, int full)
         fprintf(fp, "# (large image: showing top-left %dx%d block only, "
                     "run with --dump-full for the whole matrix)\n", rows, cols);
     for (int y = 0; y < rows; y++) {
+        int r = img->topdown ? y : img->h - 1 - y;   /* 逻辑行 → 缓冲行号 */
         fprintf(fp, "y=%d\n", y);
         for (int x = 0; x < cols; x++) {
-            const uint8_t *p = img->data + ((size_t)y * img->w + x) * 3;
+            const uint8_t *p = img->data + (size_t)r * img->stride + x * 3;
             fprintf(fp, "  x=%-5d B=%-3d G=%-3d R=%-3d\n", x, p[0], p[1], p[2]);
         }
     }
@@ -234,8 +223,14 @@ int main(int argc, char **argv)
     double read_ms = (omp_get_wtime() - t0) * 1000.0;
 
     Image out = img;
-    out.data = malloc((size_t)img.w * img.h * 3);
+    out.data = malloc((size_t)img.stride * img.h);
     if (!out.data) { fprintf(stderr, "out of memory\n"); return 1; }
+    {   /* 行尾填充字节清零（stride 对齐用；本实验图片 padlen=0，通用性保险） */
+        int padlen = img.stride - img.w * 3;
+        if (padlen)
+            for (int y = 0; y < img.h; y++)
+                memset(out.data + (size_t)y * img.stride + img.w * 3, 0, (size_t)padlen);
+    }
 
     /* 2. 并行卷积（并行部分，重点计时） */
     int maxt = omp_get_max_threads();
