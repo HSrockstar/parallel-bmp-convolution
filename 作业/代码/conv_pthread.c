@@ -129,76 +129,85 @@ static int g_w, g_h, g_stride;        /* 全局尺寸/行距，线程只读 */
 static const uint8_t *g_src;
 static uint8_t *g_dst;
 
-/* R3: 边界像素慢路径——带 sx/sy 越界检查（常数 0 填充），
- * 仅用于图像四周 2 圈（占总像素 <0.2%），让主循环完全无分支 */
-static inline void conv_pixel_guarded(int y, int x)
+/* R4: 分离核两趟卷积。
+ * 5x5 高斯核是（近似的）秩 1 矩阵：g2d[i][j] ≈ k1[i]*k1[j]。
+ * k1 取对称特征分解的主特征向量（最小二乘最优拟合，残差 max 5.4e-9，
+ * 最坏像素误差 ~1.3e-5 << 0.5 舍入阈值）。
+ * 两趟：水平 H(r)[x] = Σ_kx k1[kx]·src[r][x+kx-2]（5 行环形缓冲驻 L2，
+ * 源行只读一次）；垂直 out[y][x] = Σ_ky k1[ky]·H(y+ky-2)[x]（连续 double
+ * 累加，可向量化）。每像素乘加 75→30 次。
+ * 边界天然处理：源行越界 → H 为零行；x 方向逐 kx 取有效区间。 */
+static const double g_k1[KSIZE] = {
+    0.12007837208047906, 0.2338807408740243, 0.29208172229534735,
+    0.2338807408740243, 0.12007837208047906
+};
+
+/* 水平趟：srow==NULL 表示越界行，H 置零（常数 0 填充） */
+static void hpass(double *dst, const uint8_t *srow, int w)
 {
-    const int w = g_w, h = g_h, stride = g_stride;
-    double a0 = 0.0, a1 = 0.0, a2 = 0.0;
-    for (int ky = 0; ky < KSIZE; ky++) {
-        int sy = y + ky - KRAD;
-        if (sy < 0 || sy >= h) continue;
-        const uint8_t *srow = g_src + (size_t)sy * stride;
-        for (int kx = 0; kx < KSIZE; kx++) {
-            int sx = x + kx - KRAD;
-            if (sx < 0 || sx >= w) continue;
-            double kv = g_kernel[ky][kx];
-            const uint8_t *p = srow + sx * 3;
-            a0 += kv * p[0];
-            a1 += kv * p[1];
-            a2 += kv * p[2];
+    const size_t rowlen = (size_t)w * 3;
+    memset(dst, 0, rowlen * sizeof(double));
+    if (!srow) return;
+    for (int kx = 0; kx < KSIZE; kx++) {
+        const double kv = g_k1[kx];
+        /* sx = x+kx-2 ∈ [0,w) ⇒ x ∈ [max(0,2-kx), min(w, w+2-kx)) */
+        int x0 = KRAD - kx;
+        if (x0 < 0) x0 = 0;
+        int x1 = w + KRAD - kx;
+        if (x1 > w) x1 = w;
+        const uint8_t *s = srow + (size_t)(x0 + kx - KRAD) * 3;  /* 对齐到 x=x0 */
+        double *d = dst + (size_t)x0 * 3;
+        for (int x = x0; x < x1; x++) {
+            d[0] += kv * s[0];
+            d[1] += kv * s[1];
+            d[2] += kv * s[2];
+            d += 3; s += 3;
         }
     }
-    uint8_t *d = g_dst + (size_t)y * stride + x * 3;
-    int v0 = (int)(a0 + 0.5), v1 = (int)(a1 + 0.5), v2 = (int)(a2 + 0.5);
-    d[0] = v0 < 0 ? 0 : (v0 > 255 ? 255 : v0);
-    d[1] = v1 < 0 ? 0 : (v1 > 255 ? 255 : v1);
-    d[2] = v2 < 0 ? 0 : (v2 > 255 ? 255 : v2);
 }
+
+static inline int slot5(int r) { return ((r % 5) + 5) % 5; }   /* 行号 → 环形槽位 */
 
 static void conv_rows(int y0, int y1)
 {
     const int w = g_w, h = g_h, stride = g_stride;
-    for (int y = y0; y < y1; y++) {
-        /* 左右各 2 列边界：慢路径（w 很小时整行都走慢路径，通用性保险） */
-        if (w > 2 * KRAD) {
-            for (int x = 0; x < KRAD; x++)
-                conv_pixel_guarded(y, x);
-            for (int x = w - KRAD; x < w; x++)
-                conv_pixel_guarded(y, x);
-        } else {
-            for (int x = 0; x < w; x++)
-                conv_pixel_guarded(y, x);
-            continue;
-        }
+    const size_t rowlen = (size_t)w * 3;
+    double *hb   = malloc(5 * rowlen * sizeof(double));  /* 5 行环形缓冲（~491KB, L2） */
+    double *vbuf = malloc(rowlen * sizeof(double));      /* 垂直累加行 */
+    if (!hb || !vbuf) { free(hb); free(vbuf); return; }
 
-        if (y >= KRAD && y < h - KRAD) {
-            /* R3: 内部行主循环——无任何越界分支，25 次乘加直排，
-             * 独立标量累加器驻留寄存器，利于编译器流水线化 */
-            for (int x = KRAD; x < w - KRAD; x++) {
-                double a0 = 0.0, a1 = 0.0, a2 = 0.0;
-                for (int ky = 0; ky < KSIZE; ky++) {
-                    const uint8_t *srow = g_src
-                        + (size_t)(y + ky - KRAD) * stride + (size_t)(x - KRAD) * 3;
-                    for (int kx = 0; kx < KSIZE; kx++) {
-                        const double kv = g_kernel[ky][kx];
-                        a0 += kv * srow[kx * 3 + 0];
-                        a1 += kv * srow[kx * 3 + 1];
-                        a2 += kv * srow[kx * 3 + 2];
-                    }
-                }
-                uint8_t *d = g_dst + (size_t)y * stride + x * 3;
-                int v0 = (int)(a0 + 0.5), v1 = (int)(a1 + 0.5), v2 = (int)(a2 + 0.5);
-                d[0] = v0 < 0 ? 0 : (v0 > 255 ? 255 : v0);
-                d[1] = v1 < 0 ? 0 : (v1 > 255 ? 255 : v1);
-                d[2] = v2 < 0 ? 0 : (v2 > 255 ? 255 : v2);
-            }
-        } else {
-            /* 上下边界行（共 4 行）：中间列仍需 sy 检查，走慢路径 */
-            for (int x = KRAD; x < w - KRAD; x++)
-                conv_pixel_guarded(y, x);
-        }
+    /* 初始化窗口行 [y0-2, y0+3) */
+    for (int i = 0; i < 5; i++) {
+        int r = y0 + i - KRAD;
+        hpass(hb + (size_t)slot5(r) * rowlen,
+              (r >= 0 && r < h) ? g_src + (size_t)r * stride : NULL, w);
     }
+    for (int y = y0; y < y1; y++) {
+        /* 垂直趟：vbuf = Σ_ky k1[ky]·H(y+ky-2)，连续 double 累加 */
+        memset(vbuf, 0, rowlen * sizeof(double));
+        for (int ky = 0; ky < KSIZE; ky++) {
+            int r = y + ky - KRAD;
+            const double *hr = hb + (size_t)slot5(r) * rowlen;
+            const double kv = g_k1[ky];
+            for (size_t i = 0; i < rowlen; i++)
+                vbuf[i] += kv * hr[i];
+        }
+        /* 舍入 + 饱和写回 */
+        uint8_t *d = g_dst + (size_t)y * stride;
+        for (int x = 0; x < w; x++) {
+            int v0 = (int)(vbuf[(size_t)x * 3 + 0] + 0.5);
+            int v1 = (int)(vbuf[(size_t)x * 3 + 1] + 0.5);
+            int v2 = (int)(vbuf[(size_t)x * 3 + 2] + 0.5);
+            d[x * 3 + 0] = v0 < 0 ? 0 : (v0 > 255 ? 255 : v0);
+            d[x * 3 + 1] = v1 < 0 ? 0 : (v1 > 255 ? 255 : v1);
+            d[x * 3 + 2] = v2 < 0 ? 0 : (v2 > 255 ? 255 : v2);
+        }
+        /* 下一行滑入窗口：H(y+3) */
+        int r = y + KRAD + 1;
+        hpass(hb + (size_t)slot5(r) * rowlen,
+              (r < h) ? g_src + (size_t)r * stride : NULL, w);
+    }
+    free(hb); free(vbuf);
 }
 
 static void *thread_main(void *p)
