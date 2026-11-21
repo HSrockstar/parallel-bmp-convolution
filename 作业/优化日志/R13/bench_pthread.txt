@@ -1,0 +1,215 @@
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp
+Threads         : 1
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0  rows [    0, 2304)  conv =   38.985 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=1)    38.985 ms   (critical path = max thread)
+Conv   : sum/thread                38.985 ms   (sum of per-thread times)
+Total time      :     39.093 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp
+Threads         : 1
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0  rows [    0, 2304)  conv =   38.187 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=1)    38.187 ms   (critical path = max thread)
+Conv   : sum/thread                38.187 ms   (sum of per-thread times)
+Total time      :     40.323 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp
+Threads         : 1
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0  rows [    0, 2304)  conv =   38.082 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=1)    38.082 ms   (critical path = max thread)
+Conv   : sum/thread                38.082 ms   (sum of per-thread times)
+Total time      :     45.815 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp
+Threads         : 1
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0  rows [    0, 2304)  conv =   38.724 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=1)    38.724 ms   (critical path = max thread)
+Conv   : sum/thread                38.724 ms   (sum of per-thread times)
+Total time      :     40.366 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp
+Threads         : 1
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0  rows [    0, 2304)  conv =   37.921 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=1)    37.921 ms   (critical path = max thread)
+Conv   : sum/thread                37.921 ms   (sum of per-thread times)
+Total time      :     39.483 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp
+Threads         : 2
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0  rows [    0, 1152)  conv =   20.251 ms
+  thread 1  rows [ 1152, 2304)  conv =   20.093 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=2)    20.251 ms   (critical path = max thread)
+Conv   : sum/thread                40.343 ms   (sum of per-thread times)
+Total time      :     22.281 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp
+Threads         : 2
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0  rows [    0, 1152)  conv =   20.727 ms
+  thread 1  rows [ 1152, 2304)  conv =   19.976 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=2)    20.727 ms   (critical path = max thread)
+Conv   : sum/thread                40.703 ms   (sum of per-thread times)
+Total time      :     22.383 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp
+Threads         : 2
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0  rows [    0, 1152)  conv =   20.540 ms
+  thread 1  rows [ 1152, 2304)  conv =   19.756 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=2)    20.540 ms   (critical path = max thread)
+Conv   : sum/thread                40.296 ms   (sum of per-thread times)
+Total time      :     22.170 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp
+Threads         : 2
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0  rows [    0, 1152)  conv =   19.706 ms
+  thread 1  rows [ 1152, 2304)  conv =   20.290 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=2)    20.290 ms   (critical path = max thread)
+Conv   : sum/thread                39.996 ms   (sum of per-thread times)
+Total time      :     21.910 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp
+Threads         : 2
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0  rows [    0, 1152)  conv =   20.256 ms
+  thread 1  rows [ 1152, 2304)  conv =   20.095 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=2)    20.256 ms   (critical path = max thread)
+Conv   : sum/thread                40.351 ms   (sum of per-thread times)
+Total time      :     21.861 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp
+Threads         : 4
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0  rows [    0,  576)  conv =   11.126 ms
+  thread 1  rows [  576, 1152)  conv =   10.820 ms
+  thread 2  rows [ 1152, 1728)  conv =   10.672 ms
+  thread 3  rows [ 1728, 2304)  conv =   10.577 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=4)    11.126 ms   (critical path = max thread)
+Conv   : sum/thread                43.194 ms   (sum of per-thread times)
+Total time      :     12.929 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp
+Threads         : 4
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0  rows [    0,  576)  conv =   10.997 ms
+  thread 1  rows [  576, 1152)  conv =   10.960 ms
+  thread 2  rows [ 1152, 1728)  conv =   10.769 ms
+  thread 3  rows [ 1728, 2304)  conv =   10.659 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=4)    10.997 ms   (critical path = max thread)
+Conv   : sum/thread                43.385 ms   (sum of per-thread times)
+Total time      :     12.734 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp
+Threads         : 4
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0  rows [    0,  576)  conv =   10.819 ms
+  thread 1  rows [  576, 1152)  conv =   10.529 ms
+  thread 2  rows [ 1152, 1728)  conv =   10.963 ms
+  thread 3  rows [ 1728, 2304)  conv =   11.027 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=4)    11.027 ms   (critical path = max thread)
+Conv   : sum/thread                43.338 ms   (sum of per-thread times)
+Total time      :     12.733 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp
+Threads         : 4
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0  rows [    0,  576)  conv =   10.766 ms
+  thread 1  rows [  576, 1152)  conv =   10.630 ms
+  thread 2  rows [ 1152, 1728)  conv =   10.309 ms
+  thread 3  rows [ 1728, 2304)  conv =   10.536 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=4)    10.766 ms   (critical path = max thread)
+Conv   : sum/thread                42.241 ms   (sum of per-thread times)
+Total time      :     12.475 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R13/_bench_out.bmp
+Threads         : 4
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0  rows [    0,  576)  conv =   10.818 ms
+  thread 1  rows [  576, 1152)  conv =   10.718 ms
+  thread 2  rows [ 1152, 1728)  conv =   10.455 ms
+  thread 3  rows [ 1728, 2304)  conv =   10.715 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=4)    10.818 ms   (critical path = max thread)
+Conv   : sum/thread                42.706 ms   (sum of per-thread times)
+Total time      :     12.481 ms
