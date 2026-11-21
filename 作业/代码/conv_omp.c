@@ -97,25 +97,30 @@ static void bmp_make_header(const BmpInfo *b, uint8_t hdr[54])
 }
 
 /* ---------------- 分离核卷积 ---------------- */
-static void hpass(float *dst, const uint8_t *srow, int w)
+/* R9: 通道平面化 —— H 环形缓冲按 [槽][通道] 存放 3 个 w 长 float 平面。
+ * 源行先解交织成 B/G/R 平面，水平/垂直趟全部连续 float 访问，
+ * 8 宽向量无交织 shuffle 开销；尾趟 pack 回交错 uint8。 */
+static void hpass3(float *dst3, const uint8_t *srow, uint8_t *scratch3, int w)
 {
-    const size_t rowlen = (size_t)w * 3;
-    memset(dst, 0, rowlen * sizeof(float));
-    if (!srow) return;
+    memset(dst3, 0, 3 * (size_t)w * sizeof(float));
+    if (!srow) return;                     /* 越界行 → 零平面（常数 0 填充） */
+    for (int x = 0; x < w; x++) {          /* 解交织 BGR → 3 个 uint8 平面 */
+        scratch3[x]         = srow[(size_t)x * 3 + 0];
+        scratch3[w + x]     = srow[(size_t)x * 3 + 1];
+        scratch3[2 * w + x] = srow[(size_t)x * 3 + 2];
+    }
     for (int kx = 0; kx < KSIZE; kx++) {
         const float kv = g_k1[kx];
-        /* sx = x+kx-2 ∈ [0,w) ⇒ x ∈ [max(0,2-kx), min(w, w+2-kx)) */
+        /* 源索引 x+kx-2 ∈ [0,w) ⇒ x ∈ [max(0,2-kx), min(w, w+2-kx)) */
         int x0 = KRAD - kx;
         if (x0 < 0) x0 = 0;
         int x1 = w + KRAD - kx;
         if (x1 > w) x1 = w;
-        const uint8_t *s = srow + (size_t)(x0 + kx - KRAD) * 3;  /* 对齐到 x=x0 */
-        float *d = dst + (size_t)x0 * 3;
-        for (int x = x0; x < x1; x++) {
-            d[0] += kv * s[0];
-            d[1] += kv * s[1];
-            d[2] += kv * s[2];
-            d += 3; s += 3;
+        for (int c = 0; c < 3; c++) {
+            const uint8_t *s = scratch3 + (size_t)c * w + (kx - KRAD);
+            float *d = dst3 + (size_t)c * w;
+            for (int x = x0; x < x1; x++)
+                d[x] += kv * (float)s[x];
         }
     }
 }
@@ -125,39 +130,50 @@ static inline int slot5(int r) { return ((r % 5) + 5) % 5; }
 static void conv_band(const uint8_t *src, int base, int nrows,
                       uint8_t *dst, int w, int stride, int y0, int y1)
 {
-    const size_t rowlen = (size_t)w * 3;
-    float *hb   = malloc(5 * rowlen * sizeof(float));
-    float *vbuf = malloc(rowlen * sizeof(float));
-    if (!hb || !vbuf) { free(hb); free(vbuf); return; }
+    const size_t pw = (size_t)w;
+    float *hb   = malloc(15 * pw * sizeof(float));   /* 5 槽 × 3 通道平面（~245KB, L2） */
+    float *vbuf = malloc(3 * pw * sizeof(float));    /* 垂直累加 3 平面 */
+    uint8_t *sp = malloc(3 * pw);                    /* 解交织源行（3 uint8 平面） */
+    if (!hb || !vbuf || !sp) { free(hb); free(vbuf); free(sp); return; }
 
     for (int i = 0; i < 5; i++) {
         int r = y0 + i - KRAD;
-        hpass(hb + (size_t)slot5(r) * rowlen,
-              (r >= base && r < base + nrows) ? src + (size_t)(r - base) * stride : NULL, w);
+        hpass3(hb + (size_t)slot5(r) * 3 * pw,
+               (r >= base && r < base + nrows) ? src + (size_t)(r - base) * stride : NULL,
+               sp, w);
     }
     for (int y = y0; y < y1; y++) {
-        memset(vbuf, 0, rowlen * sizeof(float));
-        for (int ky = 0; ky < KSIZE; ky++) {
-            int r = y + ky - KRAD;
-            const float *hr = hb + (size_t)slot5(r) * rowlen;
-            const float kv = g_k1[ky];
-            for (size_t i = 0; i < rowlen; i++)
-                vbuf[i] += kv * hr[i];
+        /* 垂直趟：v[c] = Σ_ky k1[ky]·H(y+ky-2)[c]，每通道连续累加；
+         * 首趟直接写，替代 memset */
+        for (int c = 0; c < 3; c++) {
+            float *v = vbuf + c * pw;
+            const float *h0 = hb + ((size_t)slot5(y - KRAD) * 3 + c) * pw;
+            const float kv0 = g_k1[0];
+            for (size_t x = 0; x < pw; x++)
+                v[x] = kv0 * h0[x];
+            for (int ky = 1; ky < KSIZE; ky++) {
+                const float *hr = hb + ((size_t)slot5(y + ky - KRAD) * 3 + c) * pw;
+                const float kv = g_k1[ky];
+                for (size_t x = 0; x < pw; x++)
+                    v[x] += kv * hr[x];
+            }
         }
+        /* pack：3 平面 → 舍入饱和 → 交错 uint8 写回 */
         uint8_t *d = dst + (size_t)y * stride;
         for (int x = 0; x < w; x++) {
-            int v0 = (int)(vbuf[(size_t)x * 3 + 0] + 0.5f);
-            int v1 = (int)(vbuf[(size_t)x * 3 + 1] + 0.5f);
-            int v2 = (int)(vbuf[(size_t)x * 3 + 2] + 0.5f);
-            d[x * 3 + 0] = v0 < 0 ? 0 : (v0 > 255 ? 255 : v0);
-            d[x * 3 + 1] = v1 < 0 ? 0 : (v1 > 255 ? 255 : v1);
-            d[x * 3 + 2] = v2 < 0 ? 0 : (v2 > 255 ? 255 : v2);
+            int b = (int)(vbuf[x] + 0.5f);
+            int g = (int)(vbuf[pw + x] + 0.5f);
+            int r = (int)(vbuf[2 * pw + x] + 0.5f);
+            d[x * 3 + 0] = b < 0 ? 0 : (b > 255 ? 255 : b);
+            d[x * 3 + 1] = g < 0 ? 0 : (g > 255 ? 255 : g);
+            d[x * 3 + 2] = r < 0 ? 0 : (r > 255 ? 255 : r);
         }
-        int r = y + KRAD + 1;
-        hpass(hb + (size_t)slot5(r) * rowlen,
-              (r < base + nrows) ? src + (size_t)(r - base) * stride : NULL, w);
+        int rr = y + KRAD + 1;
+        hpass3(hb + (size_t)slot5(rr) * 3 * pw,
+               (rr < base + nrows) ? src + (size_t)(rr - base) * stride : NULL,
+               sp, w);
     }
-    free(hb); free(vbuf);
+    free(hb); free(vbuf); free(sp);
 }
 
 /* ---------------- 结果导出（卷积核 + 像素矩阵 txt） ---------------- */
