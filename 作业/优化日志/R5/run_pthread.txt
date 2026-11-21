@@ -1,0 +1,17 @@
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R5/timg_blur_pthread.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R5/timg_blur_pthread.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R5/timg_blur_pthread.bmp
+Threads         : 4
+---- per-thread time (read band / conv / write band) ----
+  thread 0  rows [    0,  576)  read =   2.532  conv =   15.603  write =   2.188 ms
+  thread 1  rows [  576, 1152)  read =   2.623  conv =   16.340  write =   5.291 ms
+  thread 2  rows [ 1152, 1728)  read =   2.589  conv =   16.441  write =   7.496 ms
+  thread 3  rows [ 1728, 2304)  read =   2.500  conv =   16.234  write =   3.518 ms
+---- timing (R5: per-band I/O overlapped with compute) ----
+Band read  (critical, max over threads):    2.623 ms
+Conv       (parallel region, p=4)     :   16.441 ms   (critical path = max thread)
+Conv       sum/thread                 :   64.619 ms   (sum of per-thread times)
+Band write (critical, max over threads):    7.496 ms
+Total time      :     31.109 ms

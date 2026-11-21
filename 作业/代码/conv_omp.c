@@ -1,8 +1,8 @@
 /*
- * conv_omp.c —— OpenMP 并行实现 BMP 图像高斯卷积（baseline 版本）
+ * conv_omp.c —— OpenMP 并行实现 BMP 图像高斯卷积（优化版）
  *
  * 题目：读入 24 位 BMP 图像，用 5x5 高斯核（sigma=1.5，radius=2，已归一化）、
- *       步长 1、边缘常数 0 填充做卷积，输出模糊后的 BMP；并用 OpenMP 按行并行。
+ *       步长 1、边缘常数 0 填充做卷积，输出模糊后的 BMP；并用 OpenMP 按行分条带并行。
  *
  * 用法: ./conv_omp <input.bmp> <output.bmp> [threads] [--dump-full]
  *   threads      线程数，默认 4（也可用环境变量 OMP_NUM_THREADS 控制）
@@ -12,19 +12,32 @@
  *   <output>.kernel.txt        5x5 卷积核
  *   <output>.matrix.txt        卷积后的像素矩阵（默认小图全量、大图导出左上角 20x20）
  *
- * 计时：omp_get_wtime 计读图、卷积（并行段）、写图时间，
- *       并逐线程打印各核运算时间。
+ * 优化历史（详见 ../优化日志.md）：
+ *   R1 编译选项 -O3 -march=native -funroll-loops
+ *   R2 I/O 重构：BMP 原始行序免翻转读入（核垂直对称 ⇒ 翻转图直接卷积等价）+ 单次整块写
+ *   R3 边界分离（后被 R4 结构吸收）
+ *   R4 分离核两趟卷积：5x5 核最小二乘秩 1 拟合成 1D 核（残差 5.4e-9），
+ *      水平趟 5 行环形缓冲驻 L2 + 垂直趟连续 double 累加，每像素乘加 75→30
+ *   R5 I/O 与计算重叠：每线程 pread 自己的源条带（含上下 halo）→ 卷积 →
+ *      pwrite 自己的输出条带，各线程 I/O/计算流水线化，消除串行整图读写
+ *
+ * 计时：omp_get_wtime 计全程墙钟；逐线程打印读条带/卷积（并行段）/写条带
+ *       分段耗时，并行段关键路径 = max(各线程卷积时间)。
  */
+#define _POSIX_C_SOURCE 200809L   /* pread/pwrite */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include <omp.h>
 
 #define KSIZE 5
 #define KRAD  2                     /* (KSIZE-1)/2 */
 
-/* 与教师验卷器 test.cpp 内置核逐位一致（作业统一核，不得更换） */
+/* 与教师验卷器 test.cpp 内置核逐位一致（作业统一核，不得更换）。
+ * 卷积实际用其秩 1 分解（见 g_k1），此处保留用于导出核 txt。 */
 static const double g_kernel[KSIZE][KSIZE] = {
     {0.01441881, 0.02808402, 0.03507270, 0.02808402, 0.01441881},
     {0.02808402, 0.05470020, 0.06831229, 0.05470020, 0.02808402},
@@ -33,82 +46,7 @@ static const double g_kernel[KSIZE][KSIZE] = {
     {0.01441881, 0.02808402, 0.03507270, 0.02808402, 0.01441881},
 };
 
-/* ---------------- BMP 读写 ---------------- */
-/* R2 优化：像素数据按文件原始行序直接读入最终缓冲（免 28MB 翻转拷贝），写图单次 fwrite。
- * 卷积核垂直方向对称 ⇒ 对"上下翻转的图"直接卷积 = 卷积结果上下翻转，
- * 因此无论缓冲是自下而上还是自上而下行序，用同一个卷积公式原地算即可，结果等价。 */
-typedef struct {
-    int w, h;                /* 图像宽、高 */
-    int stride;              /* 每行字节数（4 字节对齐，含尾部填充） */
-    int topdown;             /* 1: data 行序自上而下（文件负高度）；0: 自下而上 */
-    uint8_t *data;           /* 像素，BGR 交错，行 r 首地址 = data + r*stride */
-} Image;
-
-static int bmp_read(const char *path, Image *img)
-{
-    FILE *fp = fopen(path, "rb");
-    if (!fp) { fprintf(stderr, "cannot open %s\n", path); return -1; }
-
-    uint8_t hdr[54];
-    if (fread(hdr, 1, 54, fp) != 54 || hdr[0] != 'B' || hdr[1] != 'M') {
-        fprintf(stderr, "%s: not a BMP24 (BITMAPINFOHEADER) file\n", path);
-        fclose(fp);
-        return -1;
-    }
-    uint32_t off      = *(uint32_t *)&hdr[10];
-    int32_t  w        = *(int32_t *)&hdr[18];
-    int32_t  hraw     = *(int32_t *)&hdr[22];       /* >0 自下而上；<0 自上而下 */
-    uint16_t bpp      = *(uint16_t *)&hdr[28];
-    uint32_t comp     = *(uint32_t *)&hdr[30];
-    if (bpp != 24 || comp != 0) {
-        fprintf(stderr, "%s: expect uncompressed 24-bit BMP, got bpp=%u comp=%u\n",
-                path, bpp, comp);
-        fclose(fp);
-        return -1;
-    }
-
-    int h = hraw > 0 ? hraw : -hraw;
-    int stride = (w * 3 + 3) & ~3;
-    img->w = w; img->h = h; img->stride = stride;
-    img->topdown = (hraw < 0);
-    img->data = malloc((size_t)stride * h);        /* 一步到位，无中间缓冲 */
-    if (!img->data) { fclose(fp); return -1; }
-    fseek(fp, off, SEEK_SET);
-    if (fread(img->data, 1, (size_t)stride * h, fp) != (size_t)stride * h) {
-        fprintf(stderr, "%s: pixel data truncated\n", path);
-        free(img->data); fclose(fp);
-        return -1;
-    }
-    fclose(fp);
-    return 0;
-}
-
-static int bmp_write(const char *path, const Image *img)
-{
-    int h = img->h;
-    uint32_t datasize = (uint32_t)img->stride * h;
-
-    uint8_t hdr[54] = {0};
-    hdr[0] = 'B'; hdr[1] = 'M';
-    *(uint32_t *)&hdr[2]  = 54 + datasize;   /* bfSize */
-    *(uint32_t *)&hdr[10] = 54;              /* bfOffBits */
-    *(uint32_t *)&hdr[14] = 40;              /* biSize = BITMAPINFOHEADER */
-    *(int32_t  *)&hdr[18] = img->w;
-    *(int32_t  *)&hdr[22] = img->topdown ? -h : h;  /* 与输入同向，保证不镜像 */
-    *(uint16_t *)&hdr[26] = 1;               /* biPlanes */
-    *(uint16_t *)&hdr[28] = 24;              /* biBitCount */
-    *(uint32_t *)&hdr[34] = datasize;        /* biSizeImage */
-
-    FILE *fp = fopen(path, "wb");
-    if (!fp) { fprintf(stderr, "cannot create %s\n", path); return -1; }
-    fwrite(hdr, 1, 54, fp);
-    fwrite(img->data, 1, datasize, fp);      /* R2: 整块单次写（原为逐行 h 次 fwrite） */
-    fclose(fp);
-    return 0;
-}
-
-/* ---------------- OpenMP 并行卷积 ---------------- */
-/* R4: 分离核两趟卷积（与 Pthread 版同构，见 conv_pthread.c 注释）：
+/* R4: 分离核（与 Pthread 版同构，见 conv_pthread.c 注释）：
  * 水平趟 5 行环形缓冲驻 L2 + 垂直趟连续 double 累加，每像素乘加 75→30 次。
  * k1 为 5x5 核的最小二乘秩 1 拟合（残差 max 5.4e-9）。 */
 static const double g_k1[KSIZE] = {
@@ -116,8 +54,48 @@ static const double g_k1[KSIZE] = {
     0.2338807408740243, 0.12007837208047906
 };
 
-static inline int slot5(int r) { return ((r % 5) + 5) % 5; }
+/* ---------------- BMP 头解析 / 头写出 ---------------- */
+/* R2/R5: 像素按文件原始行序就地处理（核垂直对称 ⇒ 免翻转），逐条带 pread/pwrite */
+typedef struct {
+    int w, h;
+    int stride;              /* 每行字节数（4 字节对齐，含尾部填充） */
+    int topdown;             /* 1: 行序自上而下（文件负高度）；0: 自下而上 */
+    off_t data_off;          /* 文件内像素数据起始偏移 */
+} BmpInfo;
 
+static int bmp_parse_header(const uint8_t hdr[54], BmpInfo *b)
+{
+    if (hdr[0] != 'B' || hdr[1] != 'M') return -1;
+    uint32_t off      = *(uint32_t *)&hdr[10];
+    int32_t  w        = *(int32_t *)&hdr[18];
+    int32_t  hraw     = *(int32_t *)&hdr[22];
+    uint16_t bpp      = *(uint16_t *)&hdr[28];
+    uint32_t comp     = *(uint32_t *)&hdr[30];
+    if (bpp != 24 || comp != 0) return -1;
+    b->w = w;
+    b->h = hraw > 0 ? hraw : -hraw;
+    b->stride = (w * 3 + 3) & ~3;
+    b->topdown = (hraw < 0);
+    b->data_off = (off_t)off;
+    return 0;
+}
+
+static void bmp_make_header(const BmpInfo *b, uint8_t hdr[54])
+{
+    uint32_t datasize = (uint32_t)b->stride * b->h;
+    memset(hdr, 0, 54);
+    hdr[0] = 'B'; hdr[1] = 'M';
+    *(uint32_t *)&hdr[2]  = 54 + datasize;
+    *(uint32_t *)&hdr[10] = 54;
+    *(uint32_t *)&hdr[14] = 40;
+    *(int32_t  *)&hdr[18] = b->w;
+    *(int32_t  *)&hdr[22] = b->topdown ? -b->h : b->h;
+    *(uint16_t *)&hdr[26] = 1;
+    *(uint16_t *)&hdr[28] = 24;
+    *(uint32_t *)&hdr[34] = datasize;
+}
+
+/* ---------------- 分离核卷积 ---------------- */
 static void hpass(double *dst, const uint8_t *srow, int w)
 {
     const size_t rowlen = (size_t)w * 3;
@@ -141,9 +119,10 @@ static void hpass(double *dst, const uint8_t *srow, int w)
     }
 }
 
-/* 一个线程负责输出行条带 [y0, y1) */
-static void conv_band(const uint8_t *src, uint8_t *dst,
-                      int w, int h, int stride, int y0, int y1)
+static inline int slot5(int r) { return ((r % 5) + 5) % 5; }
+
+static void conv_band(const uint8_t *src, int base, int nrows,
+                      uint8_t *dst, int w, int stride, int y0, int y1)
 {
     const size_t rowlen = (size_t)w * 3;
     double *hb   = malloc(5 * rowlen * sizeof(double));
@@ -153,7 +132,7 @@ static void conv_band(const uint8_t *src, uint8_t *dst,
     for (int i = 0; i < 5; i++) {
         int r = y0 + i - KRAD;
         hpass(hb + (size_t)slot5(r) * rowlen,
-              (r >= 0 && r < h) ? src + (size_t)r * stride : NULL, w);
+              (r >= base && r < base + nrows) ? src + (size_t)(r - base) * stride : NULL, w);
     }
     for (int y = y0; y < y1; y++) {
         memset(vbuf, 0, rowlen * sizeof(double));
@@ -175,34 +154,9 @@ static void conv_band(const uint8_t *src, uint8_t *dst,
         }
         int r = y + KRAD + 1;
         hpass(hb + (size_t)slot5(r) * rowlen,
-              (r < h) ? src + (size_t)r * stride : NULL, w);
+              (r < base + nrows) ? src + (size_t)(r - base) * stride : NULL, w);
     }
     free(hb); free(vbuf);
-}
-
-/* 返回并行区墙钟时间（ms），thread_ms 带回各线程运算时间 */
-static double conv_all(const Image *img, Image *out, double *thread_ms)
-{
-    const int w = img->w, h = img->h, stride = img->stride;
-    const uint8_t *src = img->data;
-    uint8_t *dst = out->data;
-
-    double t0 = omp_get_wtime();
-    #pragma omp parallel
-    {
-        int tid = omp_get_thread_num();
-        int nth = omp_get_num_threads();
-        double ts = omp_get_wtime();
-        /* 手动按行静态等分条带（等价 schedule(static)，各线程缓冲私有、行不重叠） */
-        int chunk = (h + nth - 1) / nth;
-        int y0 = tid * chunk;
-        int y1 = y0 + chunk;
-        if (y1 > h) y1 = h;
-        if (y0 < h)
-            conv_band(src, dst, w, h, stride, y0, y1);
-        thread_ms[tid] = (omp_get_wtime() - ts) * 1000.0;
-    }
-    return (omp_get_wtime() - t0) * 1000.0;
 }
 
 /* ---------------- 结果导出（卷积核 + 像素矩阵 txt） ---------------- */
@@ -222,25 +176,25 @@ static void dump_kernel(const char *base)
     printf("kernel txt      : %s\n", path);
 }
 
-static void dump_matrix(const char *base, const Image *img, int full)
+static void dump_matrix(const char *base, const uint8_t *data,
+                        const BmpInfo *b, int full)
 {
     char path[1024];
     snprintf(path, sizeof path, "%s.matrix.txt", base);
     FILE *fp = fopen(path, "w");
     if (!fp) { fprintf(stderr, "cannot create %s\n", path); return; }
 
-    int rows = full ? img->h : (img->h < 20 ? img->h : 20);
-    int cols = full ? img->w : (img->w < 20 ? img->w : 20);
-    fprintf(fp, "# Blurred pixel matrix (B G R per pixel), image %dx%d\n",
-            img->w, img->h);
+    int rows = full ? b->h : (b->h < 20 ? b->h : 20);
+    int cols = full ? b->w : (b->w < 20 ? b->w : 20);
+    fprintf(fp, "# Blurred pixel matrix (B G R per pixel), image %dx%d\n", b->w, b->h);
     if (!full)
         fprintf(fp, "# (large image: showing top-left %dx%d block only, "
                     "run with --dump-full for the whole matrix)\n", rows, cols);
     for (int y = 0; y < rows; y++) {
-        int r = img->topdown ? y : img->h - 1 - y;   /* 逻辑行 → 缓冲行号 */
+        int r = b->topdown ? y : b->h - 1 - y;   /* 逻辑行 → 缓冲行号 */
         fprintf(fp, "y=%d\n", y);
         for (int x = 0; x < cols; x++) {
-            const uint8_t *p = img->data + (size_t)r * img->stride + x * 3;
+            const uint8_t *p = data + (size_t)r * b->stride + x * 3;
             fprintf(fp, "  x=%-5d B=%-3d G=%-3d R=%-3d\n", x, p[0], p[1], p[2]);
         }
     }
@@ -271,59 +225,111 @@ int main(int argc, char **argv)
 
     double t_all0 = omp_get_wtime();
 
-    /* 1. 读图（串行部分） */
-    double t0 = omp_get_wtime();
-    Image img;
-    if (bmp_read(in_path, &img) != 0) return 1;
-    double read_ms = (omp_get_wtime() - t0) * 1000.0;
+    /* 1. 解析 BMP 头（不读像素——像素由各线程按条带 pread） */
+    int in_fd = open(in_path, O_RDONLY);
+    if (in_fd < 0) { fprintf(stderr, "cannot open %s\n", in_path); return 1; }
+    uint8_t hdr[54];
+    BmpInfo bmp;
+    if (read(in_fd, hdr, 54) != 54 || bmp_parse_header(hdr, &bmp) != 0) {
+        fprintf(stderr, "%s: not an uncompressed 24-bit BMP (BITMAPINFOHEADER)\n", in_path);
+        close(in_fd);
+        return 1;
+    }
+    const int w = bmp.w, h = bmp.h, stride = bmp.stride;
 
-    Image out = img;
-    out.data = malloc((size_t)img.stride * img.h);
-    if (!out.data) { fprintf(stderr, "out of memory\n"); return 1; }
-    {   /* 行尾填充字节清零（stride 对齐用；本实验图片 padlen=0，通用性保险） */
-        int padlen = img.stride - img.w * 3;
+    uint8_t *out = malloc((size_t)stride * h);
+    if (!out) { fprintf(stderr, "out of memory\n"); return 1; }
+    {   /* 行尾填充字节清零（本实验图片 padlen=0，通用性保险） */
+        int padlen = stride - w * 3;
         if (padlen)
-            for (int y = 0; y < img.h; y++)
-                memset(out.data + (size_t)y * img.stride + img.w * 3, 0, (size_t)padlen);
+            for (int y = 0; y < h; y++)
+                memset(out + (size_t)y * stride + w * 3, 0, (size_t)padlen);
     }
 
-    /* 2. 并行卷积（并行部分，重点计时） */
+    /* 2. 创建输出文件并写头（各条带 pwrite 到各自偏移） */
+    uint8_t ohdr[54];
+    bmp_make_header(&bmp, ohdr);
+    int out_fd = open(out_path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (out_fd < 0) { fprintf(stderr, "cannot create %s\n", out_path); return 1; }
+    if (pwrite(out_fd, ohdr, 54, 0) != 54) { fprintf(stderr, "write header failed\n"); return 1; }
+
+    /* 3. 并行：每线程 pread 条带 → 卷积 → pwrite 条带（R5 流水线） */
+    int nth = nthreads > h ? h : nthreads;
     int maxt = omp_get_max_threads();
-    double *thread_ms = calloc((size_t)maxt, sizeof(double));
-    double conv_ms = conv_all(&img, &out, thread_ms);
+    double *read_ms  = calloc((size_t)maxt, sizeof(double));
+    double *conv_ms  = calloc((size_t)maxt, sizeof(double));
+    double *write_ms = calloc((size_t)maxt, sizeof(double));
 
-    /* 3. 写图（串行部分） */
-    t0 = omp_get_wtime();
-    if (bmp_write(out_path, &out) != 0) return 1;
-    double write_ms = (omp_get_wtime() - t0) * 1000.0;
+    #pragma omp parallel
+    {
+        int tid = omp_get_thread_num();
+        int np  = omp_get_num_threads();
+        int chunk = (h + np - 1) / np;
+        int y0 = tid * chunk;
+        int y1 = y0 + chunk;
+        if (y1 > h) y1 = h;
+        if (y0 < h) {
+            /* R5: 逐条带 pread → conv → pwrite，I/O 与其他线程的计算重叠 */
+            int y0c = y0 - KRAD < 0 ? 0 : y0 - KRAD;
+            int y1c = y1 + KRAD > h ? h : y1 + KRAD;
+            size_t band_bytes = (size_t)(y1c - y0c) * stride;
+            uint8_t *src = malloc(band_bytes);
+            if (src) {
+                double t0 = omp_get_wtime();
+                if (pread(in_fd, src, band_bytes, bmp.data_off + (off_t)y0c * stride)
+                    == (ssize_t)band_bytes) {
+                    read_ms[tid] = (omp_get_wtime() - t0) * 1000.0;
 
+                    t0 = omp_get_wtime();
+                    conv_band(src, y0c, y1c - y0c, out, w, stride, y0, y1);
+                    conv_ms[tid] = (omp_get_wtime() - t0) * 1000.0;
+
+                    t0 = omp_get_wtime();
+                    if (pwrite(out_fd, out + (size_t)y0 * stride,
+                               (size_t)(y1 - y0) * stride,
+                               bmp.data_off + (off_t)y0 * stride) >= 0)
+                        write_ms[tid] = (omp_get_wtime() - t0) * 1000.0;
+                    else
+                        fprintf(stderr, "thread %d: pwrite band failed\n", tid);
+                } else {
+                    fprintf(stderr, "thread %d: pread band failed\n", tid);
+                }
+                free(src);
+            }
+        }
+    }
+
+    close(in_fd);
+    close(out_fd);
     double total_ms = (omp_get_wtime() - t_all0) * 1000.0;
 
     /* 4. 导出卷积核 + 像素矩阵 txt */
     dump_kernel(out_path);
-    dump_matrix(out_path, &out, dump_full);
+    dump_matrix(out_path, out, &bmp, dump_full);
 
     /* 5. 计时结果 */
     printf("================ OpenMP BMP Gaussian Convolution ==================\n");
-    printf("Input           : %s (%d x %d, 24bpp, stride=%d)\n",
-           in_path, img.w, img.h, img.stride);
+    printf("Input           : %s (%d x %d, 24bpp, stride=%d)\n", in_path, w, h, stride);
     printf("Output BMP      : %s\n", out_path);
     printf("Threads         : %d\n", nthreads);
-    printf("---- per-thread compute time ----\n");
-    double sum_thread = 0.0;
-    for (int i = 0; i < nthreads; i++) {
-        printf("  thread %-2d                    time = %8.3f ms\n",
-               i, thread_ms[i]);
-        sum_thread += thread_ms[i];
+    printf("---- per-thread time (read band / conv / write band) ----\n");
+    double max_read = 0, max_conv = 0, max_write = 0, sum_conv = 0;
+    for (int i = 0; i < nth; i++) {
+        printf("  thread %-2d                    read = %7.3f  conv = %8.3f  write = %7.3f ms\n",
+               i, read_ms[i], conv_ms[i], write_ms[i]);
+        if (read_ms[i]  > max_read)  max_read  = read_ms[i];
+        if (conv_ms[i]  > max_conv)  max_conv  = conv_ms[i];
+        if (write_ms[i] > max_write) max_write = write_ms[i];
+        sum_conv += conv_ms[i];
     }
-    printf("---- timing ----\n");
-    printf("Read  time      : %10.3f ms   (serial)\n", read_ms);
-    printf("Conv  time      : %10.3f ms   (parallel region, p=%d)\n", conv_ms, nthreads);
-    printf("Conv  sum/thread: %10.3f ms   (sum of per-thread times)\n", sum_thread);
-    printf("Write time      : %10.3f ms   (serial)\n", write_ms);
+    printf("---- timing (R5: per-band I/O overlapped with compute) ----\n");
+    printf("Band read  (critical, max over threads): %8.3f ms\n", max_read);
+    printf("Conv       (parallel region, p=%d)     : %8.3f ms   (critical path = max thread)\n", nth, max_conv);
+    printf("Conv       sum/thread                 : %8.3f ms   (sum of per-thread times)\n", sum_conv);
+    printf("Band write (critical, max over threads): %8.3f ms\n", max_write);
     printf("Total time      : %10.3f ms\n", total_ms);
 
-    free(thread_ms);
-    free(img.data); free(out.data);
+    free(read_ms); free(conv_ms); free(write_ms);
+    free(out);
     return 0;
 }
