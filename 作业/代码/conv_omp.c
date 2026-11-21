@@ -49,7 +49,7 @@ static const double g_kernel[KSIZE][KSIZE] = {
 /* R4: 分离核（与 Pthread 版同构，见 conv_pthread.c 注释）：
  * 水平趟 5 行环形缓冲驻 L2 + 垂直趟连续 double 累加，每像素乘加 75→30 次。
  * k1 为 5x5 核的最小二乘秩 1 拟合（残差 max 5.4e-9）。 */
-static const double g_k1[KSIZE] = {
+static const float g_k1[KSIZE] = {  /* R6: float32 —— 8 宽向量 */
     0.12007837208047906, 0.2338807408740243, 0.29208172229534735,
     0.2338807408740243, 0.12007837208047906
 };
@@ -96,20 +96,20 @@ static void bmp_make_header(const BmpInfo *b, uint8_t hdr[54])
 }
 
 /* ---------------- 分离核卷积 ---------------- */
-static void hpass(double *dst, const uint8_t *srow, int w)
+static void hpass(float *dst, const uint8_t *srow, int w)
 {
     const size_t rowlen = (size_t)w * 3;
-    memset(dst, 0, rowlen * sizeof(double));
+    memset(dst, 0, rowlen * sizeof(float));
     if (!srow) return;
     for (int kx = 0; kx < KSIZE; kx++) {
-        const double kv = g_k1[kx];
+        const float kv = g_k1[kx];
         /* sx = x+kx-2 ∈ [0,w) ⇒ x ∈ [max(0,2-kx), min(w, w+2-kx)) */
         int x0 = KRAD - kx;
         if (x0 < 0) x0 = 0;
         int x1 = w + KRAD - kx;
         if (x1 > w) x1 = w;
         const uint8_t *s = srow + (size_t)(x0 + kx - KRAD) * 3;  /* 对齐到 x=x0 */
-        double *d = dst + (size_t)x0 * 3;
+        float *d = dst + (size_t)x0 * 3;
         for (int x = x0; x < x1; x++) {
             d[0] += kv * s[0];
             d[1] += kv * s[1];
@@ -125,8 +125,8 @@ static void conv_band(const uint8_t *src, int base, int nrows,
                       uint8_t *dst, int w, int stride, int y0, int y1)
 {
     const size_t rowlen = (size_t)w * 3;
-    double *hb   = malloc(5 * rowlen * sizeof(double));
-    double *vbuf = malloc(rowlen * sizeof(double));
+    float *hb   = malloc(5 * rowlen * sizeof(float));
+    float *vbuf = malloc(rowlen * sizeof(float));
     if (!hb || !vbuf) { free(hb); free(vbuf); return; }
 
     for (int i = 0; i < 5; i++) {
@@ -135,19 +135,19 @@ static void conv_band(const uint8_t *src, int base, int nrows,
               (r >= base && r < base + nrows) ? src + (size_t)(r - base) * stride : NULL, w);
     }
     for (int y = y0; y < y1; y++) {
-        memset(vbuf, 0, rowlen * sizeof(double));
+        memset(vbuf, 0, rowlen * sizeof(float));
         for (int ky = 0; ky < KSIZE; ky++) {
             int r = y + ky - KRAD;
-            const double *hr = hb + (size_t)slot5(r) * rowlen;
-            const double kv = g_k1[ky];
+            const float *hr = hb + (size_t)slot5(r) * rowlen;
+            const float kv = g_k1[ky];
             for (size_t i = 0; i < rowlen; i++)
                 vbuf[i] += kv * hr[i];
         }
         uint8_t *d = dst + (size_t)y * stride;
         for (int x = 0; x < w; x++) {
-            int v0 = (int)(vbuf[(size_t)x * 3 + 0] + 0.5);
-            int v1 = (int)(vbuf[(size_t)x * 3 + 1] + 0.5);
-            int v2 = (int)(vbuf[(size_t)x * 3 + 2] + 0.5);
+            int v0 = (int)(vbuf[(size_t)x * 3 + 0] + 0.5f);
+            int v1 = (int)(vbuf[(size_t)x * 3 + 1] + 0.5f);
+            int v2 = (int)(vbuf[(size_t)x * 3 + 2] + 0.5f);
             d[x * 3 + 0] = v0 < 0 ? 0 : (v0 > 255 ? 255 : v0);
             d[x * 3 + 1] = v1 < 0 ? 0 : (v1 > 255 ? 255 : v1);
             d[x * 3 + 2] = v2 < 0 ? 0 : (v2 > 255 ? 255 : v2);

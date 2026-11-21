@@ -56,7 +56,7 @@ static const double g_kernel[KSIZE][KSIZE] = {
  * 源行只读一次）；垂直 out[y][x] = Σ_ky k1[ky]·H(y+ky-2)[x]（连续 double
  * 累加，可向量化）。每像素乘加 75→30 次。
  * 边界天然处理：源行越界 → H 为零行；x 方向逐 kx 取有效区间。 */
-static const double g_k1[KSIZE] = {
+static const float g_k1[KSIZE] = {  /* R6: float32 —— 8 宽向量 */
     0.12007837208047906, 0.2338807408740243, 0.29208172229534735,
     0.2338807408740243, 0.12007837208047906
 };
@@ -124,20 +124,20 @@ static int g_in_fd = -1, g_out_fd = -1;
 static uint8_t *g_out;                  /* 整图输出缓冲（条带互不重叠） */
 
 /* 水平趟：srow==NULL 表示越界行，H 置零（常数 0 填充） */
-static void hpass(double *dst, const uint8_t *srow, int w)
+static void hpass(float *dst, const uint8_t *srow, int w)
 {
     const size_t rowlen = (size_t)w * 3;
-    memset(dst, 0, rowlen * sizeof(double));
+    memset(dst, 0, rowlen * sizeof(float));
     if (!srow) return;
     for (int kx = 0; kx < KSIZE; kx++) {
-        const double kv = g_k1[kx];
+        const float kv = g_k1[kx];
         /* sx = x+kx-2 ∈ [0,w) ⇒ x ∈ [max(0,2-kx), min(w, w+2-kx)) */
         int x0 = KRAD - kx;
         if (x0 < 0) x0 = 0;
         int x1 = w + KRAD - kx;
         if (x1 > w) x1 = w;
         const uint8_t *s = srow + (size_t)(x0 + kx - KRAD) * 3;  /* 对齐到 x=x0 */
-        double *d = dst + (size_t)x0 * 3;
+        float *d = dst + (size_t)x0 * 3;
         for (int x = x0; x < x1; x++) {
             d[0] += kv * s[0];
             d[1] += kv * s[1];
@@ -156,8 +156,8 @@ static void conv_band(const uint8_t *src, int base, int nrows,
                       uint8_t *dst, int w, int stride, int y0, int y1)
 {
     const size_t rowlen = (size_t)w * 3;
-    double *hb   = malloc(5 * rowlen * sizeof(double));  /* 5 行环形缓冲（~491KB, L2） */
-    double *vbuf = malloc(rowlen * sizeof(double));      /* 垂直累加行 */
+    float *hb   = malloc(5 * rowlen * sizeof(float));   /* R6: float32 环形缓冲（~245KB, L2） */
+    float *vbuf = malloc(rowlen * sizeof(float));       /* 垂直累加行 */
     if (!hb || !vbuf) { free(hb); free(vbuf); return; }
 
     /* 初始化窗口行 [y0-2, y0+3) */
@@ -168,20 +168,20 @@ static void conv_band(const uint8_t *src, int base, int nrows,
     }
     for (int y = y0; y < y1; y++) {
         /* 垂直趟：vbuf = Σ_ky k1[ky]·H(y+ky-2)，连续 double 累加 */
-        memset(vbuf, 0, rowlen * sizeof(double));
+        memset(vbuf, 0, rowlen * sizeof(float));
         for (int ky = 0; ky < KSIZE; ky++) {
             int r = y + ky - KRAD;
-            const double *hr = hb + (size_t)slot5(r) * rowlen;
-            const double kv = g_k1[ky];
+            const float *hr = hb + (size_t)slot5(r) * rowlen;
+            const float kv = g_k1[ky];
             for (size_t i = 0; i < rowlen; i++)
                 vbuf[i] += kv * hr[i];
         }
         /* 舍入 + 饱和写回 */
         uint8_t *d = dst + (size_t)y * stride;
         for (int x = 0; x < w; x++) {
-            int v0 = (int)(vbuf[(size_t)x * 3 + 0] + 0.5);
-            int v1 = (int)(vbuf[(size_t)x * 3 + 1] + 0.5);
-            int v2 = (int)(vbuf[(size_t)x * 3 + 2] + 0.5);
+            int v0 = (int)(vbuf[(size_t)x * 3 + 0] + 0.5f);
+            int v1 = (int)(vbuf[(size_t)x * 3 + 1] + 0.5f);
+            int v2 = (int)(vbuf[(size_t)x * 3 + 2] + 0.5f);
             d[x * 3 + 0] = v0 < 0 ? 0 : (v0 > 255 ? 255 : v0);
             d[x * 3 + 1] = v1 < 0 ? 0 : (v1 > 255 ? 255 : v1);
             d[x * 3 + 2] = v2 < 0 ? 0 : (v2 > 255 ? 255 : v2);

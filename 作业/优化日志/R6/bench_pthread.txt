@@ -1,0 +1,230 @@
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp
+Threads         : 1
+---- per-thread time (read band / conv / write band) ----
+  thread 0  rows [    0, 2304)  read =   8.435  conv =   42.606  write =   7.624 ms
+---- timing (R5: per-band I/O overlapped with compute) ----
+Band read  (critical, max over threads):    8.435 ms
+Conv       (parallel region, p=1)     :   42.606 ms   (critical path = max thread)
+Conv       sum/thread                 :   42.606 ms   (sum of per-thread times)
+Band write (critical, max over threads):    7.624 ms
+Total time      :     59.273 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp
+Threads         : 1
+---- per-thread time (read band / conv / write band) ----
+  thread 0  rows [    0, 2304)  read =   8.629  conv =   42.821  write =   7.608 ms
+---- timing (R5: per-band I/O overlapped with compute) ----
+Band read  (critical, max over threads):    8.629 ms
+Conv       (parallel region, p=1)     :   42.821 ms   (critical path = max thread)
+Conv       sum/thread                 :   42.821 ms   (sum of per-thread times)
+Band write (critical, max over threads):    7.608 ms
+Total time      :     62.906 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp
+Threads         : 1
+---- per-thread time (read band / conv / write band) ----
+  thread 0  rows [    0, 2304)  read =   8.484  conv =   42.694  write =   8.049 ms
+---- timing (R5: per-band I/O overlapped with compute) ----
+Band read  (critical, max over threads):    8.484 ms
+Conv       (parallel region, p=1)     :   42.694 ms   (critical path = max thread)
+Conv       sum/thread                 :   42.694 ms   (sum of per-thread times)
+Band write (critical, max over threads):    8.049 ms
+Total time      :     70.919 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp
+Threads         : 1
+---- per-thread time (read band / conv / write band) ----
+  thread 0  rows [    0, 2304)  read =   9.040  conv =   42.428  write =   7.819 ms
+---- timing (R5: per-band I/O overlapped with compute) ----
+Band read  (critical, max over threads):    9.040 ms
+Conv       (parallel region, p=1)     :   42.428 ms   (critical path = max thread)
+Conv       sum/thread                 :   42.428 ms   (sum of per-thread times)
+Band write (critical, max over threads):    7.819 ms
+Total time      :     62.940 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp
+Threads         : 1
+---- per-thread time (read band / conv / write band) ----
+  thread 0  rows [    0, 2304)  read =   8.747  conv =   42.498  write =   7.684 ms
+---- timing (R5: per-band I/O overlapped with compute) ----
+Band read  (critical, max over threads):    8.747 ms
+Conv       (parallel region, p=1)     :   42.498 ms   (critical path = max thread)
+Conv       sum/thread                 :   42.498 ms   (sum of per-thread times)
+Band write (critical, max over threads):    7.684 ms
+Total time      :     62.508 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp
+Threads         : 2
+---- per-thread time (read band / conv / write band) ----
+  thread 0  rows [    0, 1152)  read =   4.616  conv =   21.279  write =   3.930 ms
+  thread 1  rows [ 1152, 2304)  read =   4.647  conv =   22.160  write =   7.089 ms
+---- timing (R5: per-band I/O overlapped with compute) ----
+Band read  (critical, max over threads):    4.647 ms
+Conv       (parallel region, p=2)     :   22.160 ms   (critical path = max thread)
+Conv       sum/thread                 :   43.439 ms   (sum of per-thread times)
+Band write (critical, max over threads):    7.089 ms
+Total time      :     37.558 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp
+Threads         : 2
+---- per-thread time (read band / conv / write band) ----
+  thread 0  rows [    0, 1152)  read =   4.642  conv =   21.902  write =   7.033 ms
+  thread 1  rows [ 1152, 2304)  read =   4.555  conv =   21.256  write =   3.957 ms
+---- timing (R5: per-band I/O overlapped with compute) ----
+Band read  (critical, max over threads):    4.642 ms
+Conv       (parallel region, p=2)     :   21.902 ms   (critical path = max thread)
+Conv       sum/thread                 :   43.158 ms   (sum of per-thread times)
+Band write (critical, max over threads):    7.033 ms
+Total time      :     37.021 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp
+Threads         : 2
+---- per-thread time (read band / conv / write band) ----
+  thread 0  rows [    0, 1152)  read =   4.438  conv =   21.520  write =   4.020 ms
+  thread 1  rows [ 1152, 2304)  read =   4.609  conv =   22.145  write =   7.287 ms
+---- timing (R5: per-band I/O overlapped with compute) ----
+Band read  (critical, max over threads):    4.609 ms
+Conv       (parallel region, p=2)     :   22.145 ms   (critical path = max thread)
+Conv       sum/thread                 :   43.665 ms   (sum of per-thread times)
+Band write (critical, max over threads):    7.287 ms
+Total time      :     37.507 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp
+Threads         : 2
+---- per-thread time (read band / conv / write band) ----
+  thread 0  rows [    0, 1152)  read =   4.784  conv =   22.059  write =   6.903 ms
+  thread 1  rows [ 1152, 2304)  read =   4.604  conv =   21.431  write =   3.950 ms
+---- timing (R5: per-band I/O overlapped with compute) ----
+Band read  (critical, max over threads):    4.784 ms
+Conv       (parallel region, p=2)     :   22.059 ms   (critical path = max thread)
+Conv       sum/thread                 :   43.490 ms   (sum of per-thread times)
+Band write (critical, max over threads):    6.903 ms
+Total time      :     37.325 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp
+Threads         : 2
+---- per-thread time (read band / conv / write band) ----
+  thread 0  rows [    0, 1152)  read =   4.647  conv =   21.987  write =   6.888 ms
+  thread 1  rows [ 1152, 2304)  read =   4.481  conv =   21.230  write =   4.013 ms
+---- timing (R5: per-band I/O overlapped with compute) ----
+Band read  (critical, max over threads):    4.647 ms
+Conv       (parallel region, p=2)     :   21.987 ms   (critical path = max thread)
+Conv       sum/thread                 :   43.217 ms   (sum of per-thread times)
+Band write (critical, max over threads):    6.888 ms
+Total time      :     37.174 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp
+Threads         : 4
+---- per-thread time (read band / conv / write band) ----
+  thread 0  rows [    0,  576)  read =   2.664  conv =   11.122  write =   5.506 ms
+  thread 1  rows [  576, 1152)  read =   2.652  conv =   11.148  write =   7.451 ms
+  thread 2  rows [ 1152, 1728)  read =   2.608  conv =   10.811  write =   3.735 ms
+  thread 3  rows [ 1728, 2304)  read =   2.376  conv =   10.789  write =   1.932 ms
+---- timing (R5: per-band I/O overlapped with compute) ----
+Band read  (critical, max over threads):    2.664 ms
+Conv       (parallel region, p=4)     :   11.148 ms   (critical path = max thread)
+Conv       sum/thread                 :   43.870 ms   (sum of per-thread times)
+Band write (critical, max over threads):    7.451 ms
+Total time      :     24.611 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp
+Threads         : 4
+---- per-thread time (read band / conv / write band) ----
+  thread 0  rows [    0,  576)  read =   2.527  conv =   11.126  write =   7.582 ms
+  thread 1  rows [  576, 1152)  read =   2.482  conv =   10.800  write =   3.883 ms
+  thread 2  rows [ 1152, 1728)  read =   2.406  conv =   10.740  write =   1.999 ms
+  thread 3  rows [ 1728, 2304)  read =   2.520  conv =   11.098  write =   5.571 ms
+---- timing (R5: per-band I/O overlapped with compute) ----
+Band read  (critical, max over threads):    2.527 ms
+Conv       (parallel region, p=4)     :   11.126 ms   (critical path = max thread)
+Conv       sum/thread                 :   43.764 ms   (sum of per-thread times)
+Band write (critical, max over threads):    7.582 ms
+Total time      :     24.693 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp
+Threads         : 4
+---- per-thread time (read band / conv / write band) ----
+  thread 0  rows [    0,  576)  read =   2.448  conv =   10.835  write =   3.993 ms
+  thread 1  rows [  576, 1152)  read =   2.479  conv =   11.152  write =   5.678 ms
+  thread 2  rows [ 1152, 1728)  read =   2.419  conv =   10.789  write =   2.067 ms
+  thread 3  rows [ 1728, 2304)  read =   2.489  conv =   11.184  write =   7.591 ms
+---- timing (R5: per-band I/O overlapped with compute) ----
+Band read  (critical, max over threads):    2.489 ms
+Conv       (parallel region, p=4)     :   11.184 ms   (critical path = max thread)
+Conv       sum/thread                 :   43.960 ms   (sum of per-thread times)
+Band write (critical, max over threads):    7.591 ms
+Total time      :     24.685 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp
+Threads         : 4
+---- per-thread time (read band / conv / write band) ----
+  thread 0  rows [    0,  576)  read =   2.469  conv =   10.836  write =   1.916 ms
+  thread 1  rows [  576, 1152)  read =   2.533  conv =   11.183  write =   5.443 ms
+  thread 2  rows [ 1152, 1728)  read =   2.483  conv =   10.867  write =   3.856 ms
+  thread 3  rows [ 1728, 2304)  read =   2.494  conv =   11.196  write =   7.493 ms
+---- timing (R5: per-band I/O overlapped with compute) ----
+Band read  (critical, max over threads):    2.533 ms
+Conv       (parallel region, p=4)     :   11.196 ms   (critical path = max thread)
+Conv       sum/thread                 :   44.082 ms   (sum of per-thread times)
+Band write (critical, max over threads):    7.493 ms
+Total time      :     24.481 ms
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R6/_bench_out.bmp
+Threads         : 4
+---- per-thread time (read band / conv / write band) ----
+  thread 0  rows [    0,  576)  read =   2.502  conv =   10.801  write =   5.917 ms
+  thread 1  rows [  576, 1152)  read =   2.477  conv =   10.784  write =   4.005 ms
+  thread 2  rows [ 1152, 1728)  read =   2.534  conv =   11.274  write =   7.359 ms
+  thread 3  rows [ 1728, 2304)  read =   2.464  conv =   10.770  write =   2.029 ms
+---- timing (R5: per-band I/O overlapped with compute) ----
+Band read  (critical, max over threads):    2.534 ms
+Conv       (parallel region, p=4)     :   11.274 ms   (critical path = max thread)
+Conv       sum/thread                 :   43.628 ms   (sum of per-thread times)
+Band write (critical, max over threads):    7.359 ms
+Total time      :     24.700 ms
