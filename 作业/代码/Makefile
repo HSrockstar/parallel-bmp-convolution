@@ -7,7 +7,9 @@
 # make clean
 
 CC      := gcc
-CFLAGS  := -O2 -Wall -std=c11
+# R1: -O2 → -O3 -march=native -funroll-loops（开启自动向量化/FMA/激进调度；
+#     -march=native 在编译机上自适应本机指令集，重编译无移植问题）
+CFLAGS  := -O3 -march=native -funroll-loops -Wall -std=c11
 LD_PTHREAD := -lpthread
 
 TESTDIR := ../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序
