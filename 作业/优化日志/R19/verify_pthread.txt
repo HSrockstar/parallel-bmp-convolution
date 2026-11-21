@@ -1,0 +1,5 @@
+[PASS] Shape test passed!
+[PASS] Similarity test passed!
+MSE result: 0.00
+Similarity rate: 100.00%
+pthread: 验卷 PASS (sim=100.00%, MSE=0.00) ; 与参考图存在差异: 36 bytes differ

@@ -1,0 +1,5 @@
+date        : 2026-11-22 00:21:20
+input       : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp
+runs/config : 9 (best kept)
+loadavg     : 8.17 5.11 4.91 28/6158 694913
+governor    : powersave

@@ -1,0 +1,686 @@
+===== base T1 run1 =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 1 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   23.984 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=1)    23.984 ms   (critical path = max thread)
+Conv   : sum/thread                23.984 ms   (sum of per-thread times)
+Total time      :     27.099 ms
+Wall time (full) :     30.758 ms   (Total + 文本导出 + munmap)
+===== cand T1 run =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 1 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   23.325 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=1)    23.325 ms   (critical path = max thread)
+Conv   : sum/thread                23.325 ms   (sum of per-thread times)
+Total time      :     24.984 ms
+Wall time (full) :     28.215 ms   (Total + 文本导出 + munmap)
+===== base T1 run2 =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 1 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   24.891 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=1)    24.891 ms   (critical path = max thread)
+Conv   : sum/thread                24.891 ms   (sum of per-thread times)
+Total time      :     27.091 ms
+Wall time (full) :     30.131 ms   (Total + 文本导出 + munmap)
+===== cand T1 run =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 1 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   23.243 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=1)    23.243 ms   (critical path = max thread)
+Conv   : sum/thread                23.243 ms   (sum of per-thread times)
+Total time      :     24.850 ms
+Wall time (full) :     27.757 ms   (Total + 文本导出 + munmap)
+===== base T1 run3 =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 1 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   22.837 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=1)    22.837 ms   (critical path = max thread)
+Conv   : sum/thread                22.837 ms   (sum of per-thread times)
+Total time      :     24.438 ms
+Wall time (full) :     27.122 ms   (Total + 文本导出 + munmap)
+===== cand T1 run =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 1 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   23.270 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=1)    23.270 ms   (critical path = max thread)
+Conv   : sum/thread                23.270 ms   (sum of per-thread times)
+Total time      :     24.932 ms
+Wall time (full) :     27.896 ms   (Total + 文本导出 + munmap)
+===== base T1 run4 =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 1 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   23.037 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=1)    23.037 ms   (critical path = max thread)
+Conv   : sum/thread                23.037 ms   (sum of per-thread times)
+Total time      :     25.101 ms
+Wall time (full) :     28.642 ms   (Total + 文本导出 + munmap)
+===== cand T1 run =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 1 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   23.203 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=1)    23.203 ms   (critical path = max thread)
+Conv   : sum/thread                23.203 ms   (sum of per-thread times)
+Total time      :     24.861 ms
+Wall time (full) :     27.722 ms   (Total + 文本导出 + munmap)
+===== base T1 run5 =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 1 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   24.120 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=1)    24.120 ms   (critical path = max thread)
+Conv   : sum/thread                24.120 ms   (sum of per-thread times)
+Total time      :     26.853 ms
+Wall time (full) :     29.828 ms   (Total + 文本导出 + munmap)
+===== cand T1 run =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 1 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   23.168 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=1)    23.168 ms   (critical path = max thread)
+Conv   : sum/thread                23.168 ms   (sum of per-thread times)
+Total time      :     24.721 ms
+Wall time (full) :     27.462 ms   (Total + 文本导出 + munmap)
+===== base T1 run6 =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 1 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   26.884 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=1)    26.884 ms   (critical path = max thread)
+Conv   : sum/thread                26.884 ms   (sum of per-thread times)
+Total time      :     28.413 ms
+Wall time (full) :     31.609 ms   (Total + 文本导出 + munmap)
+===== cand T1 run =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 1 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   23.828 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=1)    23.828 ms   (critical path = max thread)
+Conv   : sum/thread                23.828 ms   (sum of per-thread times)
+Total time      :     25.506 ms
+Wall time (full) :     28.828 ms   (Total + 文本导出 + munmap)
+===== base T1 run7 =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 1 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   27.307 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=1)    27.307 ms   (critical path = max thread)
+Conv   : sum/thread                27.307 ms   (sum of per-thread times)
+Total time      :     29.831 ms
+Wall time (full) :     32.795 ms   (Total + 文本导出 + munmap)
+===== cand T1 run =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 1 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   23.151 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=1)    23.151 ms   (critical path = max thread)
+Conv   : sum/thread                23.151 ms   (sum of per-thread times)
+Total time      :     24.751 ms
+Wall time (full) :     27.442 ms   (Total + 文本导出 + munmap)
+===== base T2 run1 =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 2 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   20.593 ms
+  thread 1                     conv =   20.693 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=2)    20.693 ms   (critical path = max thread)
+Conv   : sum/thread                41.286 ms   (sum of per-thread times)
+Total time      :     26.925 ms
+Wall time (full) :     32.943 ms   (Total + 文本导出 + munmap)
+===== cand T2 run =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 2 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   20.500 ms
+  thread 1                     conv =   20.672 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=2)    20.672 ms   (critical path = max thread)
+Conv   : sum/thread                41.172 ms   (sum of per-thread times)
+Total time      :     26.423 ms
+Wall time (full) :     32.266 ms   (Total + 文本导出 + munmap)
+===== base T2 run2 =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 2 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   20.492 ms
+  thread 1                     conv =   20.583 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=2)    20.583 ms   (critical path = max thread)
+Conv   : sum/thread                41.075 ms   (sum of per-thread times)
+Total time      :     26.407 ms
+Wall time (full) :     32.269 ms   (Total + 文本导出 + munmap)
+===== cand T2 run =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 2 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   20.445 ms
+  thread 1                     conv =   19.698 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=2)    20.445 ms   (critical path = max thread)
+Conv   : sum/thread                40.143 ms   (sum of per-thread times)
+Total time      :     26.529 ms
+Wall time (full) :     32.264 ms   (Total + 文本导出 + munmap)
+===== base T2 run3 =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 2 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   19.567 ms
+  thread 1                     conv =   23.583 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=2)    23.583 ms   (critical path = max thread)
+Conv   : sum/thread                43.150 ms   (sum of per-thread times)
+Total time      :     30.300 ms
+Wall time (full) :     33.223 ms   (Total + 文本导出 + munmap)
+===== cand T2 run =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 2 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   20.590 ms
+  thread 1                     conv =   20.819 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=2)    20.819 ms   (critical path = max thread)
+Conv   : sum/thread                41.409 ms   (sum of per-thread times)
+Total time      :     26.149 ms
+Wall time (full) :     32.351 ms   (Total + 文本导出 + munmap)
+===== base T2 run4 =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 2 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   20.558 ms
+  thread 1                     conv =   20.628 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=2)    20.628 ms   (critical path = max thread)
+Conv   : sum/thread                41.186 ms   (sum of per-thread times)
+Total time      :     26.188 ms
+Wall time (full) :     32.410 ms   (Total + 文本导出 + munmap)
+===== cand T2 run =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 2 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   12.375 ms
+  thread 1                     conv =   13.976 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=2)    13.976 ms   (critical path = max thread)
+Conv   : sum/thread                26.351 ms   (sum of per-thread times)
+Total time      :     15.581 ms
+Wall time (full) :     18.417 ms   (Total + 文本导出 + munmap)
+===== base T2 run5 =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 2 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   14.490 ms
+  thread 1                     conv =   12.500 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=2)    14.490 ms   (critical path = max thread)
+Conv   : sum/thread                26.990 ms   (sum of per-thread times)
+Total time      :     16.660 ms
+Wall time (full) :     20.902 ms   (Total + 文本导出 + munmap)
+===== cand T2 run =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 2 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   20.346 ms
+  thread 1                     conv =   20.513 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=2)    20.513 ms   (critical path = max thread)
+Conv   : sum/thread                40.859 ms   (sum of per-thread times)
+Total time      :     25.851 ms
+Wall time (full) :     31.510 ms   (Total + 文本导出 + munmap)
+===== base T2 run6 =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 2 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   20.397 ms
+  thread 1                     conv =   19.488 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=2)    20.397 ms   (critical path = max thread)
+Conv   : sum/thread                39.886 ms   (sum of per-thread times)
+Total time      :     26.726 ms
+Wall time (full) :     36.005 ms   (Total + 文本导出 + munmap)
+===== cand T2 run =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 2 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   22.044 ms
+  thread 1                     conv =   24.317 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=2)    24.317 ms   (critical path = max thread)
+Conv   : sum/thread                46.361 ms   (sum of per-thread times)
+Total time      :     30.705 ms
+Wall time (full) :     34.206 ms   (Total + 文本导出 + munmap)
+===== base T2 run7 =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 2 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   14.752 ms
+  thread 1                     conv =   24.627 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=2)    24.627 ms   (critical path = max thread)
+Conv   : sum/thread                39.379 ms   (sum of per-thread times)
+Total time      :     27.716 ms
+Wall time (full) :     31.971 ms   (Total + 文本导出 + munmap)
+===== cand T2 run =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 2 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   21.155 ms
+  thread 1                     conv =   13.348 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=2)    21.155 ms   (critical path = max thread)
+Conv   : sum/thread                34.503 ms   (sum of per-thread times)
+Total time      :     23.126 ms
+Wall time (full) :     26.351 ms   (Total + 文本导出 + munmap)
+===== base T4 run1 =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 4 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   13.432 ms
+  thread 1                     conv =    6.779 ms
+  thread 2                     conv =    6.666 ms
+  thread 3                     conv =    9.951 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=4)    13.432 ms   (critical path = max thread)
+Conv   : sum/thread                36.828 ms   (sum of per-thread times)
+Total time      :     16.920 ms
+Wall time (full) :     19.696 ms   (Total + 文本导出 + munmap)
+===== cand T4 run =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 4 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =    7.070 ms
+  thread 1                     conv =    6.954 ms
+  thread 2                     conv =    7.418 ms
+  thread 3                     conv =    7.456 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=4)     7.456 ms   (critical path = max thread)
+Conv   : sum/thread                28.898 ms   (sum of per-thread times)
+Total time      :      9.390 ms
+Wall time (full) :     11.998 ms   (Total + 文本导出 + munmap)
+===== base T4 run2 =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 4 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =    7.359 ms
+  thread 1                     conv =    6.953 ms
+  thread 2                     conv =    7.411 ms
+  thread 3                     conv =    6.863 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=4)     7.411 ms   (critical path = max thread)
+Conv   : sum/thread                28.586 ms   (sum of per-thread times)
+Total time      :      9.336 ms
+Wall time (full) :     11.936 ms   (Total + 文本导出 + munmap)
+===== cand T4 run =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 4 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =    7.245 ms
+  thread 1                     conv =    6.994 ms
+  thread 2                     conv =    7.115 ms
+  thread 3                     conv =    6.935 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=4)     7.245 ms   (critical path = max thread)
+Conv   : sum/thread                28.289 ms   (sum of per-thread times)
+Total time      :      9.159 ms
+Wall time (full) :     11.819 ms   (Total + 文本导出 + munmap)
+===== base T4 run3 =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 4 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =    7.400 ms
+  thread 1                     conv =    7.012 ms
+  thread 2                     conv =    7.291 ms
+  thread 3                     conv =    6.823 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=4)     7.400 ms   (critical path = max thread)
+Conv   : sum/thread                28.525 ms   (sum of per-thread times)
+Total time      :      9.429 ms
+Wall time (full) :     12.288 ms   (Total + 文本导出 + munmap)
+===== cand T4 run =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 4 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =    6.818 ms
+  thread 1                     conv =    7.436 ms
+  thread 2                     conv =    6.964 ms
+  thread 3                     conv =    7.406 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=4)     7.436 ms   (critical path = max thread)
+Conv   : sum/thread                28.624 ms   (sum of per-thread times)
+Total time      :      9.361 ms
+Wall time (full) :     11.857 ms   (Total + 文本导出 + munmap)
+===== base T4 run4 =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 4 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =    7.424 ms
+  thread 1                     conv =    7.529 ms
+  thread 2                     conv =    7.107 ms
+  thread 3                     conv =    7.382 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=4)     7.529 ms   (critical path = max thread)
+Conv   : sum/thread                29.442 ms   (sum of per-thread times)
+Total time      :      9.449 ms
+Wall time (full) :     12.064 ms   (Total + 文本导出 + munmap)
+===== cand T4 run =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 4 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =    7.051 ms
+  thread 1                     conv =    7.152 ms
+  thread 2                     conv =    7.263 ms
+  thread 3                     conv =    7.581 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=4)     7.581 ms   (critical path = max thread)
+Conv   : sum/thread                29.048 ms   (sum of per-thread times)
+Total time      :      9.635 ms
+Wall time (full) :     12.324 ms   (Total + 文本导出 + munmap)
+===== base T4 run5 =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 4 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =    6.900 ms
+  thread 1                     conv =    7.000 ms
+  thread 2                     conv =    7.453 ms
+  thread 3                     conv =    6.959 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=4)     7.453 ms   (critical path = max thread)
+Conv   : sum/thread                28.312 ms   (sum of per-thread times)
+Total time      :      9.520 ms
+Wall time (full) :     12.217 ms   (Total + 文本导出 + munmap)
+===== cand T4 run =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 4 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =    7.184 ms
+  thread 1                     conv =    7.160 ms
+  thread 2                     conv =    7.180 ms
+  thread 3                     conv =    7.339 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=4)     7.339 ms   (critical path = max thread)
+Conv   : sum/thread                28.863 ms   (sum of per-thread times)
+Total time      :      9.345 ms
+Wall time (full) :     11.853 ms   (Total + 文本导出 + munmap)
+===== base T4 run6 =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 4 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =    7.580 ms
+  thread 1                     conv =    6.946 ms
+  thread 2                     conv =    7.050 ms
+  thread 3                     conv =    7.684 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=4)     7.684 ms   (critical path = max thread)
+Conv   : sum/thread                29.260 ms   (sum of per-thread times)
+Total time      :      9.658 ms
+Wall time (full) :     12.316 ms   (Total + 文本导出 + munmap)
+===== cand T4 run =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 4 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =    6.928 ms
+  thread 1                     conv =    6.943 ms
+  thread 2                     conv =    7.449 ms
+  thread 3                     conv =    6.897 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=4)     7.449 ms   (critical path = max thread)
+Conv   : sum/thread                28.216 ms   (sum of per-thread times)
+Total time      :      9.333 ms
+Wall time (full) :     12.163 ms   (Total + 文本导出 + munmap)
+===== base T4 run7 =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 4 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =    6.873 ms
+  thread 1                     conv =    7.201 ms
+  thread 2                     conv =    7.442 ms
+  thread 3                     conv =    7.106 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=4)     7.442 ms   (critical path = max thread)
+Conv   : sum/thread                28.621 ms   (sum of per-thread times)
+Total time      :      9.310 ms
+Wall time (full) :     12.142 ms   (Total + 文本导出 + munmap)
+===== cand T4 run =====
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../优化日志/R20/_ab_out.bmp
+Threads         : 4 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =    7.185 ms
+  thread 1                     conv =    7.694 ms
+  thread 2                     conv =    7.051 ms
+  thread 3                     conv =    7.028 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=4)     7.694 ms   (critical path = max thread)
+Conv   : sum/thread                28.957 ms   (sum of per-thread times)
+Total time      :      9.767 ms
+Wall time (full) :     12.715 ms   (Total + 文本导出 + munmap)

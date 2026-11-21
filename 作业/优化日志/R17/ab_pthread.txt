@@ -1,0 +1,7 @@
+# A/B 交替对照  round=R17  version=pthread  runs/config=7
+# date 2026-11-22 00:11:22   loadavg 3.74 4.78 5.28 5/6109 683984
+# base=../优化日志/_ab_base/conv_pthread
+# cand=/home/hyc2452273/图片卷积/作业/代码/conv_pthread
+T1  base: best=26.861 med=28.589 | cand: best=28.333 med=29.802 | Δbest=+5.48%  Δmed=+4.24%
+T2  base: best=16.101 med=16.525 | cand: best=15.952 med=16.504 | Δbest=-0.93%  Δmed=-0.13%
+T4  base: best=9.421 med=9.772 | cand: best=9.511 med=9.847 | Δbest=+0.96%  Δmed=+0.77%

@@ -1,0 +1,98 @@
+===== base T1 run1 =====
+===== cand T1 run =====
+===== base T1 run2 =====
+===== cand T1 run =====
+===== base T1 run3 =====
+===== cand T1 run =====
+===== base T1 run4 =====
+===== cand T1 run =====
+===== base T1 run5 =====
+===== cand T1 run =====
+===== base T1 run6 =====
+===== cand T1 run =====
+===== base T1 run7 =====
+===== cand T1 run =====
+===== base T2 run1 =====
+===== cand T2 run =====
+===== base T2 run2 =====
+===== cand T2 run =====
+===== base T2 run3 =====
+===== cand T2 run =====
+===== base T2 run4 =====
+===== cand T2 run =====
+===== base T2 run5 =====
+===== cand T2 run =====
+===== base T2 run6 =====
+===== cand T2 run =====
+===== base T2 run7 =====
+===== cand T2 run =====
+===== base T4 run1 =====
+===== cand T4 run =====
+===== base T4 run2 =====
+===== cand T4 run =====
+===== base T4 run3 =====
+===== cand T4 run =====
+===== base T4 run4 =====
+===== cand T4 run =====
+===== base T4 run5 =====
+===== cand T4 run =====
+===== base T4 run6 =====
+===== cand T4 run =====
+===== base T4 run7 =====
+===== cand T4 run =====
+# A/B 交替对照  round=R19  version=omp  runs/config=7
+# date 2026-11-22 00:18:15   loadavg 2.83 3.42 4.50 5/6127 691601
+# base=../优化日志/_ab_base/conv_omp
+# cand=/home/hyc2452273/图片卷积/作业/代码/conv_omp
+T1  base: best=29.238 med=29.408 | cand: best=25.131 med=25.460 | Δbest=-14.05%  Δmed=-13.42%
+T2  base: best=16.883 med=17.013 | cand: best=14.799 med=15.424 | Δbest=-12.34%  Δmed=-9.34%
+T4  base: best=19.890 med=23.618 | cand: best=16.693 med=18.925 | Δbest=-16.07%  Δmed=-19.87%
+===== base T1 run1 =====
+===== cand T1 run =====
+===== base T1 run2 =====
+===== cand T1 run =====
+===== base T1 run3 =====
+===== cand T1 run =====
+===== base T1 run4 =====
+===== cand T1 run =====
+===== base T1 run5 =====
+===== cand T1 run =====
+===== base T1 run6 =====
+===== cand T1 run =====
+===== base T1 run7 =====
+===== cand T1 run =====
+===== base T2 run1 =====
+===== cand T2 run =====
+===== base T2 run2 =====
+===== cand T2 run =====
+===== base T2 run3 =====
+===== cand T2 run =====
+===== base T2 run4 =====
+===== cand T2 run =====
+===== base T2 run5 =====
+===== cand T2 run =====
+===== base T2 run6 =====
+===== cand T2 run =====
+===== base T2 run7 =====
+===== cand T2 run =====
+===== base T4 run1 =====
+===== cand T4 run =====
+===== base T4 run2 =====
+===== cand T4 run =====
+===== base T4 run3 =====
+===== cand T4 run =====
+===== base T4 run4 =====
+===== cand T4 run =====
+===== base T4 run5 =====
+===== cand T4 run =====
+===== base T4 run6 =====
+===== cand T4 run =====
+===== base T4 run7 =====
+===== cand T4 run =====
+# A/B 交替对照  round=R19  version=pthread  runs/config=7
+# date 2026-11-22 00:18:14   loadavg 2.83 3.42 4.50 3/6068 691028
+# base=../优化日志/_ab_base/conv_pthread
+# cand=/home/hyc2452273/图片卷积/作业/代码/conv_pthread
+T1  base: best=27.944 med=28.769 | cand: best=24.708 med=25.203 | Δbest=-11.58%  Δmed=-12.40%
+T2  base: best=16.384 med=29.358 | cand: best=14.612 med=15.306 | Δbest=-10.82%  Δmed=-47.86%
+T4  base: best=10.281 med=17.029 | cand: best=12.225 med=15.110 | Δbest=+18.91%  Δmed=-11.27%

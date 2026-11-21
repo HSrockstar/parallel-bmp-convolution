@@ -1,0 +1,5 @@
+[PASS] Shape test passed!
+[PASS] Similarity test passed!
+MSE result: 0.00
+Similarity rate: 99.99%
+omp: 验卷 PASS (sim=99.99%, MSE=0.00) ; 与参考图存在差异: 14382 bytes differ

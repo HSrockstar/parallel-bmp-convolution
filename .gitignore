@@ -7,3 +7,9 @@
 # benchmark 中间产物
 作业/结果/bench_blur.bmp
 *.bmp.kernel.txt.tmp
+
+# A/B 基准基线二进制存档（本机用，不入库）
+作业/优化日志/_ab_base/
+
+# A/B 基准中间产物（每次运行覆盖，不留档）
+作业/优化日志/*/_ab_out.bmp*

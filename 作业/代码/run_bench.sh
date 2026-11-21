@@ -19,6 +19,9 @@ RUNS=3
 
 mkdir -p "$RESULT"
 
+# 基准整备：先构建，失败即中止；输出图与 bench_round 统一放仓库文件系统（本机与 /tmp 同盘，纯口径统一）
+make -s -C "$PROG_DIR" all || { echo "ERROR: 构建失败，中止基准" >&2; exit 1; }
+
 total_ms_of() {            # 从程序输出里抓 Total time 数值
     awk '/^Total time/ {print $(NF-1)}' "$1"
 }
@@ -29,9 +32,9 @@ bench_one() {              # $1=程序 $2=线程数 $3=cpu列表 $4=日志前缀
     for _ in $(seq 1 $RUNS); do
         local out
         if [[ "$bin" == *omp ]]; then
-            out=$(OMP_NUM_THREADS="$threads" taskset -c "$cpus" "$bin" "$INPUT" /tmp/conv_bench_blur.bmp)
+            out=$(OMP_NUM_THREADS="$threads" taskset -c "$cpus" "$bin" "$INPUT" "$RESULT/bench_blur.bmp")
         else
-            out=$(taskset -c "$cpus" "$bin" "$INPUT" /tmp/conv_bench_blur.bmp "$threads")
+            out=$(taskset -c "$cpus" "$bin" "$INPUT" "$RESULT/bench_blur.bmp" "$threads")
         fi
         [[ -n "$out" ]] && printf '%s\n' "$out" >> "$log"
         local t

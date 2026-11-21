@@ -23,6 +23,8 @@ IN="$TESTDIR/timg.bmp"
 REF="$LOGROOT/reference.bmp"
 
 mkdir -p "$OUTDIR"
+# 基准整备（R16 教训）：先构建，失败即中止，杜绝拿旧二进制做正确性验证
+make -s -C "$PROG_DIR" all || { echo "ERROR: 构建失败，中止检查" >&2; exit 1; }
 FAIL=0
 
 taskset -c 0,2,4,6 "$PROG_DIR/conv_pthread" "$IN" "$OUTDIR/timg_blur_pthread.bmp" 4 > "$OUTDIR/run_pthread.txt" 2>&1 \

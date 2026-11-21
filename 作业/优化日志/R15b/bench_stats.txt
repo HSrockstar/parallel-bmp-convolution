@@ -1,0 +1,3 @@
+conv_pthread	threads=1	cpus=0	best=29.253	median=29.707	all=29.450,30.446,29.253,29.707,30.364,
+conv_pthread	threads=2	cpus=0,2	best=17.111	median=17.532	all=17.570,17.532,17.153,17.111,18.374,
+conv_pthread	threads=4	cpus=0,2,4,6	best=13.527	median=16.457	all=13.527,14.338,23.593,16.457,17.034,

@@ -26,6 +26,15 @@
  *      免 vbuf 4 次读改写整平面往返（T4 −18%；插桩实测 vpass 占纯计算 49%）
  *   R15 hpass 单趟融合：内部区 5 tap 单趟算完（与 R14 同构），边缘 4 列走
  *      逐 tap 旧路径，窄图（w≤4）保留原实现（T4 再 −2.8%）
+ *   R17/R18 探索（回退）：线程绑核与 vpass+pack 融合均无收益（详见
+ *      ../优化日志.md R17/R18 小节），代码未保留，数据留档
+ *   R19 连续 BGR 单布局：每行视作 3w 字节数组，水平 tap 步长 3 字节（同通道），
+ *      H 环形缓冲与源行/输出行同序，垂直趟直接舍入写字节——免解交织/pack/
+ *      vbuf（T1 −12%，T4 两版 −6.1/−6.8%，输出逐字节一致）
+ *   R20 定点探索（回退）：精度达标（相似度 99.99%）但整数向量化 uop 受限，
+ *      T4 无收益；数据留档 优化日志/R20/
+ *   R21 posix_fallocate 输出预分配：块分配从并行缺页路径挪到串行预备段
+ *      （T4 −6.5%，T1 −1.4%，输出逐字节不变）
  *
  * 计时：omp_get_wtime 计全程墙钟；逐线程打印读条带/卷积（并行段）/写条带
  *       分段耗时，并行段关键路径 = max(各线程卷积时间)。
@@ -105,81 +114,52 @@ static void bmp_make_header(const BmpInfo *b, uint8_t hdr[54])
 }
 
 /* ---------------- 分离核卷积 ---------------- */
-/* R9: 通道平面化 —— H 环形缓冲按 [槽][通道] 存放 3 个 w 长 float 平面。
- * 源行先解交织成 B/G/R 平面，水平/垂直趟全部连续 float 访问，
- * 8 宽向量无交织 shuffle 开销；尾趟 pack 回交错 uint8。 */
-static void hpass3(float *dst3, const uint8_t *srow, uint8_t *scratch3, int w)
+/* R19: 连续 BGR 单布局 —— 三通道共用同一 1D 核 ⇒ 每行视作长度 3w 的字节
+ * 数组，水平 tap 读取 n±6/n±3/n（步长 3 字节，始终落在同一颜色通道）。
+ * H 环形缓冲每槽 3w float（与源行字节同序），垂直趟读相同布局后直接
+ * 舍入饱和写字节。与 R9 平面化相比：免解交织（scratch3）、免 pack
+ * 交织、免 vbuf，数值路径逐元素等价（左结合次序不变）→ 输出逐字节一致。 */
+static void hpass_row(float *dst, const uint8_t *srow, int w)
 {
-    if (!srow) { memset(dst3, 0, 3 * (size_t)w * sizeof(float)); return; }  /* 零平面 */
-    for (int x = 0; x < w; x++) {          /* 解交织 BGR → 3 个 uint8 平面 */
-        scratch3[x]         = srow[(size_t)x * 3 + 0];
-        scratch3[w + x]     = srow[(size_t)x * 3 + 1];
-        scratch3[2 * w + x] = srow[(size_t)x * 3 + 2];
-    }
+    const int n3 = w * 3;
+    if (!srow) { memset(dst, 0, (size_t)n3 * sizeof(float)); return; }  /* 零行（越界） */
     if (w > 2 * KRAD) {
-        /* R15: 内部区 [KRAD, w-KRAD) 单趟融合 —— 每 x 一次算完 5 tap
-         * （5 u8 load + cvt + 4 FMA + 1 store），免 H 平面 4 次读改写
-         * 整平面往返（与 R14 的 vpass 同构）。求和左结合次序与原实现一致。 */
+        /* 内部区 [6, n3-6)：单趟 5 tap（与 R15 同构），步长 3 字节 */
         const float k0 = g_k1[0], k1 = g_k1[1], k2 = g_k1[2],
                     k3 = g_k1[3], k4 = g_k1[4];
-        for (int c = 0; c < 3; c++) {
-            const uint8_t *s = scratch3 + (size_t)c * w;
-            float *d = dst3 + (size_t)c * w;
-            for (int x = KRAD; x < w - KRAD; x++)
-                d[x] = k0 * (float)s[x - 2] + k1 * (float)s[x - 1]
-                     + k2 * (float)s[x]     + k3 * (float)s[x + 1]
-                     + k4 * (float)s[x + 2];
-        }
-        /* 边缘各 2 列：tap 有效区间不同，逐 tap 累加（kx 升序，次序不变） */
+        for (int n = 2 * KRAD * 3; n < n3 - 2 * KRAD * 3; n++)
+            dst[n] = k0 * (float)srow[n - 6] + k1 * (float)srow[n - 3]
+                   + k2 * (float)srow[n]     + k3 * (float)srow[n + 3]
+                   + k4 * (float)srow[n + 6];
+        /* 边缘 [0,6) ∪ [n3-6,n3)：tap 偏移 d=(kx-2)*3，逐 tap 有效区间累加
+         * （kx 升序；首 tap 先把两窗置零）。左窗 tap d 的有效起点 n ≥ -d，
+         * 右窗有效终点 n < n3-d。 */
         for (int kx = 0; kx < KSIZE; kx++) {
             const float kv = g_k1[kx];
-            int x0 = KRAD - kx;
-            if (x0 < 0) x0 = 0;
-            int x1 = w + KRAD - kx;
-            if (x1 > w) x1 = w;
-            for (int c = 0; c < 3; c++) {
-                const uint8_t *s = scratch3 + (size_t)c * w + (kx - KRAD);
-                float *d = dst3 + (size_t)c * w;
-                if (kx == 0) {
-                    for (int x = 0; x < KRAD; x++)
-                        d[x] = 0.0f;             /* 左边界无贡献，显式置零 */
-                    for (int x = w - KRAD; x < x1; x++)
-                        d[x] = kv * (float)s[x];
-                } else {
-                    for (int x = x0; x < KRAD && x < x1; x++)
-                        d[x] += kv * (float)s[x];
-                    for (int x = (w - KRAD > x0 ? w - KRAD : x0); x < x1; x++)
-                        d[x] += kv * (float)s[x];
-                }
+            const int d = (kx - KRAD) * 3;
+            const int l0 = -d > 0 ? -d : 0;              /* 左窗起点 */
+            const int r1 = n3 - d > n3 ? n3 : n3 - d;    /* 右窗终点（开） */
+            if (kx == 0) {
+                for (int n = 0; n < 2 * KRAD * 3; n++) dst[n] = 0.0f;
+                for (int n = n3 - 2 * KRAD * 3; n < n3; n++) dst[n] = 0.0f;
             }
+            for (int n = l0; n < 2 * KRAD * 3; n++)
+                dst[n] += kv * (float)srow[n + d];
+            for (int n = n3 - 2 * KRAD * 3; n < n3 && n < r1; n++)
+                dst[n] += kv * (float)srow[n + d];
         }
         return;
     }
-    /* 窄图（w ≤ 4，内部区为空）：逐 tap 有效区间累加，与 R10 行为一致 */
-    {
-        const float kv0 = g_k1[0];
-        for (int c = 0; c < 3; c++) {
-            float *d = dst3 + (size_t)c * w;
-            const uint8_t *s = scratch3 + (size_t)c * w - KRAD;
-            for (int x = 0; x < KRAD && x < w; x++)
-                d[x] = 0.0f;
-            for (int x = KRAD; x < w; x++)
-                d[x] = kv0 * (float)s[x];
-        }
-    }
-    for (int kx = 1; kx < KSIZE; kx++) {
+    /* 窄图（w ≤ 4，内部区为空；左右窗会重叠，改整行逐 tap 有效区间） */
+    for (int kx = 0; kx < KSIZE; kx++) {
         const float kv = g_k1[kx];
-        /* 源索引 x+kx-2 ∈ [0,w) ⇒ x ∈ [max(0,2-kx), min(w, w+2-kx)) */
-        int x0 = KRAD - kx;
-        if (x0 < 0) x0 = 0;
-        int x1 = w + KRAD - kx;
-        if (x1 > w) x1 = w;
-        for (int c = 0; c < 3; c++) {
-            const uint8_t *s = scratch3 + (size_t)c * w + (kx - KRAD);
-            float *d = dst3 + (size_t)c * w;
-            for (int x = x0; x < x1; x++)
-                d[x] += kv * (float)s[x];
-        }
+        const int d = (kx - KRAD) * 3;
+        int n0 = -d > 0 ? -d : 0;
+        int n1 = n3 - (d > 0 ? d : 0);
+        if (kx == 0)
+            for (int n = 0; n < n3; n++) dst[n] = 0.0f;
+        for (int n = n0; n < n1; n++)
+            dst[n] += kv * (float)srow[n + d];
     }
 }
 
@@ -188,53 +168,39 @@ static inline int slot5(int r) { return ((r % 5) + 5) % 5; }
 static void conv_band(const uint8_t *src, int base, int nrows,
                       uint8_t *dst, int w, int stride, int y0, int y1)
 {
-    const size_t pw = (size_t)w;
-    float *hb   = malloc(15 * pw * sizeof(float));   /* 5 槽 × 3 通道平面（~245KB, L2） */
-    float *vbuf = malloc(3 * pw * sizeof(float));    /* 垂直累加 3 平面 */
-    uint8_t *sp = malloc(3 * pw);                    /* 解交织源行（3 uint8 平面） */
-    if (!hb || !vbuf || !sp) { free(hb); free(vbuf); free(sp); return; }
+    const size_t sn = (size_t)w * 3;                  /* 每行有效字节数（H 槽步长） */
+    float *hb = malloc(5 * sn * sizeof(float));       /* 5 槽 × 3w float（~245KB, L2） */
+    if (!hb) return;
 
     for (int i = 0; i < 5; i++) {
         int r = y0 + i - KRAD;
-        hpass3(hb + (size_t)slot5(r) * 3 * pw,
-               (r >= base && r < base + nrows) ? src + (size_t)(r - base) * stride : NULL,
-               sp, w);
+        hpass_row(hb + (size_t)slot5(r) * sn,
+                  (r >= base && r < base + nrows) ? src + (size_t)(r - base) * stride : NULL,
+                  w);
     }
     for (int y = y0; y < y1; y++) {
-        /* 垂直趟：v[c] = Σ_ky k1[ky]·H(y+ky-2)[c]。
-         * R14: 单趟融合 —— 每 x 一次算完 5 tap（5 load + 4 FMA + 1 store），
-         * 免去 vbuf 4 次"读-改-写"整平面往返（每行 48KB×4 的 L1 流量；
-         * 插桩实测 vpass 占纯计算 49%，为此轮主攻）。求和保持左结合，
-         * 与原 5 次累加逐位一致。 */
-        for (int c = 0; c < 3; c++) {
-            float *v = vbuf + c * pw;
-            const float *h0 = hb + ((size_t)slot5(y - KRAD) * 3 + c) * pw;
-            const float *h1 = hb + ((size_t)slot5(y - KRAD + 1) * 3 + c) * pw;
-            const float *h2 = hb + ((size_t)slot5(y - KRAD + 2) * 3 + c) * pw;
-            const float *h3 = hb + ((size_t)slot5(y - KRAD + 3) * 3 + c) * pw;
-            const float *h4 = hb + ((size_t)slot5(y - KRAD + 4) * 3 + c) * pw;
-            const float k0 = g_k1[0], k1 = g_k1[1], k2 = g_k1[2],
-                        k3 = g_k1[3], k4 = g_k1[4];
-            for (size_t x = 0; x < pw; x++)
-                v[x] = k0 * h0[x] + k1 * h1[x] + k2 * h2[x]
-                     + k3 * h3[x] + k4 * h4[x];
-        }
-        /* pack：3 平面 → 舍入饱和 → 交错 uint8 写回 */
+        /* 垂直趟+pack 融合：v[n] = Σ_ky k1[ky]·H(y+ky-2)[n]，直接舍入饱和
+         * 写字节（H 与输出行同为 BGR 连续布局，pack 退化为逐字节写出）。 */
+        const float k0 = g_k1[0], k1 = g_k1[1], k2 = g_k1[2],
+                    k3 = g_k1[3], k4 = g_k1[4];
+        const float *h0 = hb + (size_t)slot5(y - KRAD) * sn;
+        const float *h1 = hb + (size_t)slot5(y - KRAD + 1) * sn;
+        const float *h2 = hb + (size_t)slot5(y - KRAD + 2) * sn;
+        const float *h3 = hb + (size_t)slot5(y - KRAD + 3) * sn;
+        const float *h4 = hb + (size_t)slot5(y - KRAD + 4) * sn;
         uint8_t *d = dst + (size_t)y * stride;
-        for (int x = 0; x < w; x++) {
-            int b = (int)(vbuf[x] + 0.5f);
-            int g = (int)(vbuf[pw + x] + 0.5f);
-            int r = (int)(vbuf[2 * pw + x] + 0.5f);
-            d[x * 3 + 0] = b < 0 ? 0 : (b > 255 ? 255 : b);
-            d[x * 3 + 1] = g < 0 ? 0 : (g > 255 ? 255 : g);
-            d[x * 3 + 2] = r < 0 ? 0 : (r > 255 ? 255 : r);
+        const int n3 = w * 3;
+        for (int n = 0; n < n3; n++) {
+            float v = k0 * h0[n] + k1 * h1[n] + k2 * h2[n] + k3 * h3[n] + k4 * h4[n];
+            int o = (int)(v + 0.5f);
+            d[n] = o < 0 ? 0 : (o > 255 ? 255 : o);
         }
         int rr = y + KRAD + 1;
-        hpass3(hb + (size_t)slot5(rr) * 3 * pw,
-               (rr < base + nrows) ? src + (size_t)(rr - base) * stride : NULL,
-               sp, w);
+        hpass_row(hb + (size_t)slot5(rr) * sn,
+                  (rr < base + nrows) ? src + (size_t)(rr - base) * stride : NULL,
+                  w);
     }
-    free(hb); free(vbuf); free(sp);
+    free(hb);
 }
 
 /* ---------------- 结果导出（卷积核 + 像素矩阵 txt） ---------------- */
@@ -330,6 +296,9 @@ int main(int argc, char **argv)
     if (ftruncate(out_fd, (off_t)out_mapsize) != 0) {
         fprintf(stderr, "ftruncate failed\n"); return 1;
     }
+    if (posix_fallocate(out_fd, 0, (off_t)out_mapsize) != 0) {  /* R21: 预分配物理块 */
+        fprintf(stderr, "fallocate failed\n"); return 1;
+    }
     if (pwrite(out_fd, ohdr, 54, 0) != 54) { fprintf(stderr, "write header failed\n"); return 1; }
     uint8_t *out_map = mmap(NULL, out_mapsize, PROT_READ | PROT_WRITE, MAP_SHARED, out_fd, 0);
     if (out_map == MAP_FAILED) { fprintf(stderr, "mmap output failed\n"); return 1; }
@@ -399,5 +368,8 @@ int main(int argc, char **argv)
     free(conv_ms);
     munmap(out_map, out_mapsize);
     munmap(in_map, (size_t)in_size);
+    /* 基准整备：Total time 口径保持不变（可比），另报全程墙钟（含文本导出+munmap） */
+    printf("Wall time (full) : %10.3f ms   (Total + 文本导出 + munmap)\n",
+           (omp_get_wtime() - t_all0) * 1000.0);
     return 0;
 }

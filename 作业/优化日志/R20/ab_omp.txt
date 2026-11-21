@@ -1,0 +1,7 @@
+# A/B 交替对照  round=R20  version=omp  runs/config=7
+# date 2026-11-22 00:23:18   loadavg 12.14 7.74 5.91 5/6163 697155
+# base=../优化日志/_ab_base/conv_omp
+# cand=/home/hyc2452273/图片卷积/作业/代码/conv_omp
+T1  base: best=24.438 med=27.091 | cand: best=24.721 med=24.861 | Δbest=+1.16%  Δmed=-8.23%
+T2  base: best=16.660 med=26.726 | cand: best=15.581 med=26.149 | Δbest=-6.48%  Δmed=-2.16%
+T4  base: best=9.310 med=9.449 | cand: best=9.159 med=9.361 | Δbest=-1.62%  Δmed=-0.93%
