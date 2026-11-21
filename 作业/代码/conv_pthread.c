@@ -130,14 +130,25 @@ static uint8_t *g_out;                  /* 输出像素区（= g_out_map + data_
  * 8 宽向量无交织 shuffle 开销；尾趟 pack 回交错 uint8。 */
 static void hpass3(float *dst3, const uint8_t *srow, uint8_t *scratch3, int w)
 {
-    memset(dst3, 0, 3 * (size_t)w * sizeof(float));
-    if (!srow) return;                     /* 越界行 → 零平面（常数 0 填充） */
+    if (!srow) { memset(dst3, 0, 3 * (size_t)w * sizeof(float)); return; }  /* 零平面 */
     for (int x = 0; x < w; x++) {          /* 解交织 BGR → 3 个 uint8 平面 */
         scratch3[x]         = srow[(size_t)x * 3 + 0];
         scratch3[w + x]     = srow[(size_t)x * 3 + 1];
         scratch3[2 * w + x] = srow[(size_t)x * 3 + 2];
     }
-    for (int kx = 0; kx < KSIZE; kx++) {
+    /* R10: kx=0 首趟直接写（免整平面 memset）；其左边界 2 列无贡献，显式置零 */
+    {
+        const float kv0 = g_k1[0];
+        for (int c = 0; c < 3; c++) {
+            float *d = dst3 + (size_t)c * w;
+            const uint8_t *s = scratch3 + (size_t)c * w - KRAD;
+            for (int x = 0; x < KRAD && x < w; x++)
+                d[x] = 0.0f;
+            for (int x = KRAD; x < w; x++)
+                d[x] = kv0 * (float)s[x];
+        }
+    }
+    for (int kx = 1; kx < KSIZE; kx++) {
         const float kv = g_k1[kx];
         /* 源索引 x+kx-2 ∈ [0,w) ⇒ x ∈ [max(0,2-kx), min(w, w+2-kx)) */
         int x0 = KRAD - kx;
