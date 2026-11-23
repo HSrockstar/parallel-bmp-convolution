@@ -1,0 +1,4 @@
+7339d276d9a8a8cde108ebea996ca62c90e84322fcffa46d91d28b2b5a3f63aa  /home/hyc2452273/图片卷积/作业/优化日志/R23/baseline_src/conv_pthread.c
+e38fdd7b56878d899483478a51e5d7b7ab7b5124ed3f3aa3b79e9bd1e227da15  /home/hyc2452273/图片卷积/作业/优化日志/R23/candidate_src/conv_pthread.c
+34c9e075e08cf98c40b15dff9b87256151f1944c99a1a26557267e08f5efac7d  /home/hyc2452273/图片卷积/作业/优化日志/R23/baseline_src/conv_omp.c
+2ee456eb784844d2c1bf322a8d33f1a70f09798bd98b450a83ca6f93e5b1eedb  /home/hyc2452273/图片卷积/作业/优化日志/R23/candidate_src/conv_omp.c

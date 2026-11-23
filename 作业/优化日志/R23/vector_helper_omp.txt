@@ -1,0 +1,303 @@
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:177:23: optimized: loop vectorized using 32 byte vectors
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:177:23: optimized: loop vectorized using 16 byte vectors
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:170:13: note: vectorized 1 loops in function.
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:184:1: note: ***** Analysis failed with vector mode V8SF
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:184:1: note: ***** Skipping vector mode V32QI, which would repeat the analysis for V8SF
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:137:29: missed: couldn't vectorize loop
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:137:29: missed: not vectorized: loop nest containing two or more consecutive inner loops cannot be vectorized
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:148:48: optimized: loop vectorized using 32 byte vectors
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:148:48: optimized:  loop versioned for vectorization because of possible aliasing
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:148:48: optimized: loop vectorized using 16 byte vectors
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:146:32: missed: couldn't vectorize loop
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:147:32: missed: not vectorized: relevant stmt not supported: _50 = (float) _49;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:130:34: optimized: loop vectorized using 32 byte vectors
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:130:34: optimized:  loop versioned for vectorization because of possible aliasing
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:130:34: optimized: loop vectorized using 16 byte vectors
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:154:25: missed: couldn't vectorize loop
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:154:25: missed: not vectorized: control flow in loop.
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:161:28: optimized: loop vectorized using 32 byte vectors
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:161:28: optimized:  loop versioned for vectorization because of possible aliasing
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:161:28: optimized: loop vectorized using 16 byte vectors
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:122:13: note: vectorized 3 loops in function.
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:160:49: missed: statement clobbers memory: __builtin_memset (dst_116(D), 0, _327);
+/usr/include/x86_64-linux-gnu/bits/string_fortified.h:59:10: missed: statement clobbers memory: __builtin_memset (dst_116(D), 0, _2);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: ***** Analysis succeeded with vector mode V8SF
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: SLPing BB part
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: Costing subgraph: 
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: node 0x1edafab8 (max_nunits=4, refcnt=1)
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: op template: *dst_116(D) = 0.0;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: 	stmt 0 *dst_116(D) = 0.0;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: 	stmt 1 MEM[(float *)dst_116(D) + 4B] = 0.0;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: 	stmt 2 MEM[(float *)dst_116(D) + 8B] = 0.0;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: 	stmt 3 MEM[(float *)dst_116(D) + 12B] = 0.0;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: 	children 0x1edafb30
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: node (constant) 0x1edafb30 (max_nunits=1, refcnt=1)
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: 	{ 0.0, 0.0, 0.0, 0.0 }
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: Cost model analysis: 
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: Cost model analysis for part in loop 5:
+  Vector cost: 24
+  Scalar cost: 48
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: Basic block will be vectorized using SLP
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: Vectorizing SLP tree:
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: node 0x1edafab8 (max_nunits=4, refcnt=1)
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: op template: *dst_116(D) = 0.0;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: 	stmt 0 *dst_116(D) = 0.0;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: 	stmt 1 MEM[(float *)dst_116(D) + 4B] = 0.0;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: 	stmt 2 MEM[(float *)dst_116(D) + 8B] = 0.0;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: 	stmt 3 MEM[(float *)dst_116(D) + 12B] = 0.0;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: 	children 0x1edafb30
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: node (constant) 0x1edafb30 (max_nunits=1, refcnt=1)
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: 	{ 0.0, 0.0, 0.0, 0.0 }
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: ------>vectorizing SLP node starting from: *dst_116(D) = 0.0;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: vect_is_simple_use: operand 0.0, type of def: constant
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: vect_is_simple_use: operand 0.0, type of def: constant
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: vect_is_simple_use: operand 0.0, type of def: constant
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: transform store. ncopies = 1
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: create vector_type-pointer variable to type: vector(4) float  vectorizing a pointer ref: *dst_116(D)
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: created vectp.412_491
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: add new stmt: MEM <vector(4) float> [(float *)vectp.412_491] = { 0.0, 0.0, 0.0, 0.0 };
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: vectorizing stmts using SLP.
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: optimized: basic block part vectorized using 32 byte vectors
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: Costing subgraph: 
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: node 0x1edafba8 (max_nunits=2, refcnt=1)
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: op template: MEM[(float *)dst_116(D) + 16B] = 0.0;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: 	stmt 0 MEM[(float *)dst_116(D) + 16B] = 0.0;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: 	stmt 1 MEM[(float *)dst_116(D) + 20B] = 0.0;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: 	children 0x1edafc20
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: node (constant) 0x1edafc20 (max_nunits=1, refcnt=1)
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: 	{ 0.0, 0.0 }
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: Cost model analysis: 
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: Cost model analysis for part in loop 5:
+  Vector cost: 24
+  Scalar cost: 24
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: Vectorizing SLP tree:
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: node 0x1edafba8 (max_nunits=2, refcnt=1)
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: op template: MEM[(float *)dst_116(D) + 16B] = 0.0;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: 	stmt 0 MEM[(float *)dst_116(D) + 16B] = 0.0;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: 	stmt 1 MEM[(float *)dst_116(D) + 20B] = 0.0;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: 	children 0x1edafc20
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: node (constant) 0x1edafc20 (max_nunits=1, refcnt=1)
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: 	{ 0.0, 0.0 }
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: ------>vectorizing SLP node starting from: MEM[(float *)dst_116(D) + 16B] = 0.0;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: vect_is_simple_use: operand 0.0, type of def: constant
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: transform store. ncopies = 1
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: create vector_type-pointer variable to type: vector(2) float  vectorizing a pointer ref: MEM[(float *)dst_116(D) + 16B]
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: created vectp.414_75
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: add new stmt: MEM <vector(2) float> [(float *)vectp.414_75] = { 0.0, 0.0 };
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: vectorizing stmts using SLP.
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: optimized: basic block part vectorized using 32 byte vectors
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:143:59: note: ***** The result for vector mode V32QI would be the same
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:230:27: optimized: loop vectorized using 32 byte vectors
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:230:27: optimized: loop vectorized using 16 byte vectors
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:204:18: missed: couldn't vectorize loop
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:204:18: missed: not vectorized: control flow in loop.
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:193:23: missed: couldn't vectorize loop
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:193:23: missed: not vectorized: control flow in loop.
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: note: vectorized 1 loops in function.
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:368:25: missed: statement clobbers memory: t0_34 = omp_get_wtime ();
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:190:17: missed: statement clobbers memory: hb_48 = malloc (_47);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:195:9: missed: statement clobbers memory: hpass_row (_64, iftmp.17_65, w_11);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:213:9: missed: statement clobbers memory: hpass_row (_125, iftmp.18_126, w_11);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:217:9: missed: statement clobbers memory: vpass2_pack (h0_76, h1_84, h2_91, h3_99, h4_107, _125, d0_111, d1_112, n3_67);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:219:9: missed: statement clobbers memory: hpass_row (_138, iftmp.19_139, w_11);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:236:5: missed: statement clobbers memory: free (hb_48);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:370:29: missed: statement clobbers memory: _38 = omp_get_wtime ();
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:370:26: note: ***** Analysis failed with vector mode V4DI
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:370:26: note: ***** Skipping vector mode V32QI, which would repeat the analysis for V4DI
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:270:23: missed: couldn't vectorize loop
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:270:23: missed: not vectorized: control flow in loop.
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:273:27: missed: couldn't vectorize loop
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:105:10: missed: statement clobbers memory: __fprintf_chk (fp_202, 1, "  x=%-5d B=%-3d G=%-3d R=%-3d\n", x_332, _234, _232, _230);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:299:23: missed: couldn't vectorize loop
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:299:23: missed: not vectorized: control flow in loop.
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:284:5: note: vectorized 0 loops in function.
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:300:13: missed: statement clobbers memory: _7 = strcmp (_6, "--dump-full");
+/usr/include/stdlib.h:364:16: missed: statement clobbers memory: _130 = strtol (_6, 0B, 10);
+/usr/include/stdlib.h:364:16: missed: statement clobbers memory: _132 = strtol (_8, 0B, 10);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:303:23: missed: statement clobbers memory: omp_set_num_threads (nthreads_277);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:305:21: missed: statement clobbers memory: t_all0_79 = omp_get_wtime ();
+/usr/include/x86_64-linux-gnu/bits/fcntl2.h:53:14: missed: statement clobbers memory: _134 = __open_alias (in_path_75, 0);
+/usr/include/x86_64-linux-gnu/bits/unistd.h:38:10: missed: statement clobbers memory: iftmp.26_135 = __read_alias (_134, &hdr, 54);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:318:21: missed: statement clobbers memory: in_size_85 = lseek (_134, 0, 2);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:319:23: missed: statement clobbers memory: in_map_87 = mmap (0B, in_size.3_12, 1, 1, _134, 0);
+/usr/include/x86_64-linux-gnu/bits/string_fortified.h:59:10: missed: statement clobbers memory: __builtin_memset (&ohdr, 0, 54);
+/usr/include/x86_64-linux-gnu/bits/fcntl2.h:53:14: missed: statement clobbers memory: _136 = __open_alias (out_path_76, 578, 420);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:329:9: missed: statement clobbers memory: _21 = ftruncate (_136, out_mapsize.6_20);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:332:9: missed: statement clobbers memory: _24 = posix_fallocate (_136, 0, out_mapsize.6_20);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:335:9: missed: statement clobbers memory: _26 = pwrite (_136, &ohdr, 54, 0);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:336:24: missed: statement clobbers memory: out_map_94 = mmap (0B, out_mapsize_89, 3, 1, _136, 0);
+/usr/include/x86_64-linux-gnu/bits/string_fortified.h:59:10: missed: statement clobbers memory: __builtin_memset (_35, 0, _34);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:349:16: missed: statement clobbers memory: maxt_99 = omp_get_max_threads ();
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:350:23: missed: statement clobbers memory: conv_ms_101 = calloc (_42, 8);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:284:5: missed: statement clobbers memory: __builtin_GOMP_parallel (main._omp_fn.0, &.omp_data_o.16, 0, 0);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:374:5: missed: statement clobbers memory: close (_134);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:375:5: missed: statement clobbers memory: close (_136);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:376:24: missed: statement clobbers memory: _43 = omp_get_wtime ();
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:71:10: missed: statement clobbers memory: __builtin___snprintf_chk (&path, 1024, 1, 1024, "%s.kernel.txt", out_path_76);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:244:16: missed: statement clobbers memory: fp_239 = fopen (&path, "w");
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:105:10: missed: statement clobbers memory: __fprintf_chk (fp_239, 1, "# 5x5 Gaussian kernel, sigma=1.5, radius=2, stride=1, normalized\n");
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:105:10: missed: statement clobbers memory: __fprintf_chk (fp_239, 1, "%s%.8f", "", _243);
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:105:10: missed: statement clobbers memory: __fprintf_chk (fp_239, 1, "%s%.8f", " ", _243);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:250:9: missed: statement clobbers memory: fputc (10, fp_239);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:252:5: missed: statement clobbers memory: fclose (fp_239);
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:112:10: missed: statement clobbers memory: __printf_chk (1, "kernel txt      : %s\n", &path);
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:105:10: missed: statement clobbers memory: __fprintf_chk (stderr.29_240, 1, "cannot create %s\n", &path);
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:71:10: missed: statement clobbers memory: __builtin___snprintf_chk (&path, 1024, 1, 1024, "%s.matrix.txt", out_path_76);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:261:16: missed: statement clobbers memory: fp_202 = fopen (&path, "w");
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:105:10: missed: statement clobbers memory: __fprintf_chk (fp_202, 1, "# Blurred pixel matrix (B G R per pixel), image %dx%d\n", pretmp_314, pretmp_315);
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:105:10: missed: statement clobbers memory: __fprintf_chk (fp_202, 1, "# (large image: showing top-left %dx%d block only, run with --dump-full for the whole matrix)\n", iftmp.32_206, iftmp.33_209);
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:105:10: missed: statement clobbers memory: __fprintf_chk (fp_202, 1, "# Blurred pixel matrix (B G R per pixel), image %dx%d\n", pretmp_314, pretmp_315);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:278:5: missed: statement clobbers memory: fclose (fp_202);
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:112:10: missed: statement clobbers memory: __printf_chk (1, "matrix txt      : %s (%s)\n", &path, iftmp.35_237);
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:105:10: missed: statement clobbers memory: __fprintf_chk (fp_202, 1, "y=%d\n", y_217);
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:105:10: missed: statement clobbers memory: __fprintf_chk (fp_202, 1, "  x=%-5d B=%-3d G=%-3d R=%-3d\n", x_332, _234, _232, _230);
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:105:10: missed: statement clobbers memory: __fprintf_chk (stderr.31_203, 1, "cannot create %s\n", &path);
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:112:10: missed: statement clobbers memory: __printf_chk (1, "================ OpenMP BMP Gaussian Convolution ==================\n");
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:112:10: missed: statement clobbers memory: __printf_chk (1, "Input           : %s (%d x %d, 24bpp, stride=%d)\n", in_path_75, w_174, _181, _184);
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:112:10: missed: statement clobbers memory: __printf_chk (1, "Output BMP      : %s\n", out_path_76);
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:112:10: missed: statement clobbers memory: __printf_chk (1, "Threads         : %d%s\n", np_actual_111, iftmp.13_64);
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:112:10: missed: statement clobbers memory: __printf_chk (1, "---- per-thread conv time (R8: I/O \xe9\x9b\xb6\xe6\x8b\xb7\xe8\xb4\x9d mmap\xef\xbc\x8c\xe7\xbc\xba\xe9\xa1\xb5\xe8\xae\xa1\xe5\x85\xa5 conv) ----\n");
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:112:10: missed: statement clobbers memory: __printf_chk (1, "---- timing ----\n");
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:112:10: missed: statement clobbers memory: __printf_chk (1, "I/O    : mmap \xe9\x9b\xb6\xe6\x8b\xb7\xe8\xb4\x9d\xef\xbc\x88\xe8\xaf\xbb=\xe6\x8c\x89\xe9\x9c\x80\xe7\xbc\xba\xe9\xa1\xb5+\xe9\xa1\xb5\xe7\xbc\x93\xe5\xad\x98\xe5\x91\xbd\xe4\xb8\xad\xef\xbc\x8c\xe5\x86\x99=\xe7\x9b\xb4\xe6\x8e\xa5\xe5\x86\x99\xe8\x84\x8f\xe9\xa1\xb5\xef\xbc\x8c\xe6\x97\xa0\xe6\x98\xbe\xe5\xbc\x8f\xe8\xaf\xbb\xe5\x86\x99\xef\xbc\x89\n");
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:112:10: missed: statement clobbers memory: __printf_chk (1, "Conv   : (parallel region, p=%d)  %8.3f ms   (critical path = max thread)\n", np_actual_111, max_conv_288);
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:112:10: missed: statement clobbers memory: __printf_chk (1, "Conv   : sum/thread              %8.3f ms   (sum of per-thread times)\n", sum_conv_292);
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:112:10: missed: statement clobbers memory: __printf_chk (1, "Total time      : %10.3f ms\n", total_ms_116);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:401:5: missed: statement clobbers memory: free (conv_ms_101);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:402:5: missed: statement clobbers memory: munmap (out_map_94, out_mapsize_89);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:403:5: missed: statement clobbers memory: munmap (in_map_87, in_size.3_12);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:406:13: missed: statement clobbers memory: _50 = omp_get_wtime ();
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:112:10: missed: statement clobbers memory: __printf_chk (1, "Wall time (full) : %10.3f ms   (Total + \xe6\x96\x87\xe6\x9c\xac\xe5\xaf\xbc\xe5\x87\xba + munmap)\n", _52);
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:112:10: missed: statement clobbers memory: __printf_chk (1, "  thread %-2d                    conv = %8.3f ms\n", i_62, _48);
+/usr/include/x86_64-linux-gnu/bits/string_fortified.h:59:10: missed: statement clobbers memory: __builtin_memset (_41, 0, _36);
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:105:10: missed: statement clobbers memory: __fprintf_chk (stderr.11_28, 1, "mmap output failed\n");
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:105:10: missed: statement clobbers memory: __fprintf_chk (stderr.10_27, 1, "write header failed\n");
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:105:10: missed: statement clobbers memory: __fprintf_chk (stderr.9_25, 1, "fallocate failed\n");
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:105:10: missed: statement clobbers memory: __fprintf_chk (stderr.7_22, 1, "ftruncate failed\n");
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:105:10: missed: statement clobbers memory: __fprintf_chk (stderr.5_14, 1, "cannot create %s\n", out_path_76);
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:105:10: missed: statement clobbers memory: __fprintf_chk (stderr.4_13, 1, "mmap input failed\n");
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:105:10: missed: statement clobbers memory: __fprintf_chk (stderr.2_11, 1, "%s: not an uncompressed 24-bit BMP (BITMAPINFOHEADER)\n", in_path_75);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:314:9: missed: statement clobbers memory: close (_134);
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:105:10: missed: statement clobbers memory: __fprintf_chk (stderr.1_9, 1, "cannot open %s\n", in_path_75);
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:105:10: missed: statement clobbers memory: __fprintf_chk (stderr.0_2, 1, "Usage: %s <input.bmp> <output.bmp> [threads] [--dump-full]\n", _1);
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: note: ***** Analysis succeeded with vector mode V4DI
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: note: SLPing BB part
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: Costing subgraph: 
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: node 0x1efa5848 (max_nunits=4, refcnt=1)
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: op template: bmp.w = w_174;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: 	stmt 0 bmp.w = w_174;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: 	stmt 1 bmp.h = _181;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: 	stmt 2 bmp.stride = _184;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: 	stmt 3 bmp.topdown = _186;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: 	children 0x1efa58c0
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: node (external) 0x1efa58c0 (max_nunits=1, refcnt=1)
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: 	{ w_174, _181, _184, _186 }
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: Cost model analysis: 
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: Cost model analysis for part in loop 0:
+  Vector cost: 28
+  Scalar cost: 48
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: Basic block will be vectorized using SLP
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: Vectorizing SLP tree:
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: node 0x1efa5848 (max_nunits=4, refcnt=1)
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: op template: bmp.w = w_174;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: 	stmt 0 bmp.w = w_174;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: 	stmt 1 bmp.h = _181;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: 	stmt 2 bmp.stride = _184;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: 	stmt 3 bmp.topdown = _186;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: 	children 0x1efa58c0
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: node (external) 0x1efa58c0 (max_nunits=1, refcnt=1)
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: 	{ w_174, _181, _184, _186 }
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: ------>vectorizing SLP node starting from: bmp.w = w_174;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: vect_is_simple_use: operand ABS_EXPR <hraw_175>, type of def: internal
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: vect_is_simple_use: operand _183 & -4, type of def: internal
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: vect_is_simple_use: operand (int) _185, type of def: internal
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: transform store. ncopies = 1
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: create vector_type-pointer variable to type: vector(4) int  vectorizing a pointer ref: bmp.w
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: created &bmp.w
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: add new stmt: MEM <vector(4) int> [(int *)&bmp] = _249;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: note: vectorizing stmts using SLP.
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:93:10: optimized: basic block part vectorized using 32 byte vectors
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:105:12: note: Costing subgraph: 
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:105:12: note: node 0x1efa5938 (max_nunits=2, refcnt=1)
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:105:12: note: op template: MEM[(uint8_t *)&ohdr] = 66;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:105:12: note: 	stmt 0 MEM[(uint8_t *)&ohdr] = 66;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:105:12: note: 	stmt 1 MEM[(uint8_t *)&ohdr + 1B] = 77;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:105:12: note: 	children 0x1efa59b0
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:105:12: note: node (constant) 0x1efa59b0 (max_nunits=1, refcnt=1)
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:105:12: note: 	{ 66, 77 }
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:105:12: note: Cost model analysis: 
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:105:12: note: Cost model analysis for part in loop 0:
+  Vector cost: 24
+  Scalar cost: 24
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:105:12: note: Vectorizing SLP tree:
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:105:12: note: node 0x1efa5938 (max_nunits=2, refcnt=1)
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:105:12: note: op template: MEM[(uint8_t *)&ohdr] = 66;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:105:12: note: 	stmt 0 MEM[(uint8_t *)&ohdr] = 66;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:105:12: note: 	stmt 1 MEM[(uint8_t *)&ohdr + 1B] = 77;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:105:12: note: 	children 0x1efa59b0
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:105:12: note: node (constant) 0x1efa59b0 (max_nunits=1, refcnt=1)
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:105:12: note: 	{ 66, 77 }
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:105:12: note: ------>vectorizing SLP node starting from: MEM[(uint8_t *)&ohdr] = 66;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:105:12: note: vect_is_simple_use: operand 77, type of def: constant
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:105:12: note: transform store. ncopies = 1
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:105:12: note: create vector_type-pointer variable to type: vector(2) unsigned char  vectorizing a pointer ref: MEM[(uint8_t *)&ohdr]
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:105:12: note: created &MEM[(uint8_t *)&ohdr]
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:105:12: note: add new stmt: MEM <vector(2) unsigned char> [(uint8_t *)&ohdr] = { 66, 77 };
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:105:12: note: vectorizing stmts using SLP.
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:105:12: optimized: basic block part vectorized using 32 byte vectors
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:107:27: note: Costing subgraph: 
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:107:27: note: node 0x1efa5a28 (max_nunits=2, refcnt=1)
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:107:27: note: op template: MEM[(uint32_t *)&ohdr + 10B] = 54;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:107:27: note: 	stmt 0 MEM[(uint32_t *)&ohdr + 10B] = 54;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:107:27: note: 	stmt 1 MEM[(uint32_t *)&ohdr + 14B] = 40;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:107:27: note: 	children 0x1efa5aa0
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:107:27: note: node (constant) 0x1efa5aa0 (max_nunits=1, refcnt=1)
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:107:27: note: 	{ 54, 40 }
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:107:27: note: Cost model analysis: 
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:107:27: note: Cost model analysis for part in loop 0:
+  Vector cost: 24
+  Scalar cost: 24
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:107:27: note: Vectorizing SLP tree:
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:107:27: note: node 0x1efa5a28 (max_nunits=2, refcnt=1)
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:107:27: note: op template: MEM[(uint32_t *)&ohdr + 10B] = 54;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:107:27: note: 	stmt 0 MEM[(uint32_t *)&ohdr + 10B] = 54;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:107:27: note: 	stmt 1 MEM[(uint32_t *)&ohdr + 14B] = 40;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:107:27: note: 	children 0x1efa5aa0
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:107:27: note: node (constant) 0x1efa5aa0 (max_nunits=1, refcnt=1)
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:107:27: note: 	{ 54, 40 }
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:107:27: note: ------>vectorizing SLP node starting from: MEM[(uint32_t *)&ohdr + 10B] = 54;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:107:27: note: vect_is_simple_use: operand 40, type of def: constant
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:107:27: note: transform store. ncopies = 1
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:107:27: note: create vector_type-pointer variable to type: vector(2) unsigned int  vectorizing a pointer ref: MEM[(uint32_t *)&ohdr + 10B]
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:107:27: note: created &MEM[(uint32_t *)&ohdr + 10B]
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:107:27: note: add new stmt: MEM <vector(2) unsigned int> [(uint32_t *)&ohdr + 10B] = { 54, 40 };
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:107:27: note: vectorizing stmts using SLP.
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:107:27: optimized: basic block part vectorized using 32 byte vectors
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: note: Costing subgraph: 
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: note: node 0x1efa5c08 (max_nunits=2, refcnt=1)
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: note: op template: .omp_data_o.16.w = w_174;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: note: 	stmt 0 .omp_data_o.16.w = w_174;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: note: 	stmt 1 .omp_data_o.16.h = _181;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: note: 	children 0x1efa5c80
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: note: node (external) 0x1efa5c80 (max_nunits=1, refcnt=1)
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: note: 	{ w_174, _181 }
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: note: Cost model analysis: 
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: note: Cost model analysis for part in loop 0:
+  Vector cost: 20
+  Scalar cost: 24
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: note: Vectorizing SLP tree:
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: note: node 0x1efa5c08 (max_nunits=2, refcnt=1)
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: note: op template: .omp_data_o.16.w = w_174;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: note: 	stmt 0 .omp_data_o.16.w = w_174;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: note: 	stmt 1 .omp_data_o.16.h = _181;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: note: 	children 0x1efa5c80
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: note: node (external) 0x1efa5c80 (max_nunits=1, refcnt=1)
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: note: 	{ w_174, _181 }
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: note: ------>vectorizing SLP node starting from: .omp_data_o.16.w = w_174;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: note: vect_is_simple_use: operand ABS_EXPR <hraw_175>, type of def: internal
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: note: transform store. ncopies = 1
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: note: create vector_type-pointer variable to type: const vector(2) int  vectorizing a pointer ref: .omp_data_o.16.w
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: note: created &.omp_data_o.16.w
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: note: add new stmt: MEM <const vector(2) int> [(int *)&.omp_data_o.16 + 32B] = _224;
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: note: vectorizing stmts using SLP.
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: optimized: basic block part vectorized using 32 byte vectors
+/home/hyc2452273/图片卷积/作业/代码/conv_omp.c:353:13: note: ***** The result for vector mode V32QI would be the same

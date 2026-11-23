@@ -1,0 +1,54 @@
+# Blurred pixel matrix (B G R per pixel), image 12x4
+# (large image: showing top-left 4x12 block only, run with --dump-full for the whole matrix)
+y=0
+  x=0     B=55  G=63  R=50 
+  x=1     B=73  G=85  R=72 
+  x=2     B=78  G=90  R=88 
+  x=3     B=72  G=87  R=88 
+  x=4     B=72  G=84  R=87 
+  x=5     B=79  G=79  R=86 
+  x=6     B=84  G=69  R=86 
+  x=7     B=82  G=68  R=90 
+  x=8     B=81  G=68  R=89 
+  x=9     B=81  G=72  R=84 
+  x=10    B=77  G=64  R=72 
+  x=11    B=60  G=46  R=55 
+y=1
+  x=0     B=68  G=87  R=75 
+  x=1     B=94  G=114 R=101
+  x=2     B=106 G=117 R=118
+  x=3     B=103 G=111 R=118
+  x=4     B=103 G=106 R=123
+  x=5     B=109 G=106 R=123
+  x=6     B=113 G=99  R=119
+  x=7     B=109 G=101 R=119
+  x=8     B=111 G=99  R=115
+  x=9     B=109 G=102 R=116
+  x=10    B=100 G=90  R=107
+  x=11    B=74  G=65  R=85 
+y=2
+  x=0     B=62  G=86  R=79 
+  x=1     B=90  G=111 R=102
+  x=2     B=108 G=113 R=115
+  x=3     B=109 G=105 R=115
+  x=4     B=109 G=101 R=124
+  x=5     B=111 G=106 R=127
+  x=6     B=113 G=105 R=120
+  x=7     B=109 G=108 R=114
+  x=8     B=111 G=104 R=110
+  x=9     B=107 G=106 R=115
+  x=10    B=96  G=93  R=113
+  x=11    B=69  G=69  R=93 
+y=3
+  x=0     B=41  G=63  R=63 
+  x=1     B=62  G=80  R=76 
+  x=2     B=81  G=79  R=82 
+  x=3     B=86  G=71  R=82 
+  x=4     B=86  G=69  R=92 
+  x=5     B=83  G=78  R=97 
+  x=6     B=83  G=83  R=90 
+  x=7     B=79  G=84  R=80 
+  x=8     B=81  G=80  R=77 
+  x=9     B=76  G=80  R=85 
+  x=10    B=65  G=70  R=89 
+  x=11    B=45  G=53  R=76 

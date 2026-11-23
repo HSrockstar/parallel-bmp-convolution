@@ -1,0 +1,17 @@
+kernel txt      : /home/hyc2452273/图片卷积/作业/优化日志/R23/asan_final/edge/omp_w10_h8_blur.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/优化日志/R23/asan_final/edge/omp_w10_h8_blur.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/优化日志/R23/asan_final/edge/omp_w10_h8.bmp (10 x 8, 24bpp, stride=32)
+Output BMP      : /home/hyc2452273/图片卷积/作业/优化日志/R23/asan_final/edge/omp_w10_h8_blur.bmp
+Threads         : 4 (OMP_NUM_THREADS / default)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =    0.051 ms
+  thread 1                     conv =    0.053 ms
+  thread 2                     conv =    0.063 ms
+  thread 3                     conv =    0.055 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=4)     0.063 ms   (critical path = max thread)
+Conv   : sum/thread                 0.222 ms   (sum of per-thread times)
+Total time      :      0.512 ms
+Wall time (full) :      0.715 ms   (Total + 文本导出 + munmap)

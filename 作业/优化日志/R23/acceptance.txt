@@ -1,0 +1,11 @@
+Final acceptance date: 2026-11-23T19:16:16+08:00
+Source identity: pthread = R22c
+omp = R22c
+Six teacher checks: PASS
+MSE result: 0.00
+Similarity rate: 100.00%
+Boundary regression: 144 cases, 0 failures；results=/home/hyc2452273/图片卷积/作业/优化日志/R23/reverted_edge/results.tsv
+ASan boundary regression: 144 cases, 0 failures；results=/home/hyc2452273/图片卷积/作业/优化日志/R23/asan_final/edge/results.tsv
+ASan isolated-row log sizes (expected 0/0): 0 /home/hyc2452273/图片卷积/作业/优化日志/R23/asan_final/row_pthread.txt
+0 /home/hyc2452273/图片卷积/作业/优化日志/R23/asan_final/row_omp.txt
+0 total

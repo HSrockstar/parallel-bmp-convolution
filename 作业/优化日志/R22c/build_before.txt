@@ -1,0 +1,5 @@
+make: Entering directory '/home/hyc2452273/图片卷积/作业/代码'
+rm -f conv_pthread conv_omp
+gcc-11 -O3 -march=native -funroll-loops -ffp-contract=fast -Wall -std=c11 conv_pthread.c -o conv_pthread -lpthread
+gcc-11 -O3 -march=native -funroll-loops -ffp-contract=fast -Wall -std=c11 -fopenmp conv_omp.c -o conv_omp
+make: Leaving directory '/home/hyc2452273/图片卷积/作业/代码'

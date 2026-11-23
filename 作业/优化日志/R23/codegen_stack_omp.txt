@@ -1,0 +1,1 @@
+omp: main AVX2 loop stack references (between first vmulps ymm and loop-end jne):

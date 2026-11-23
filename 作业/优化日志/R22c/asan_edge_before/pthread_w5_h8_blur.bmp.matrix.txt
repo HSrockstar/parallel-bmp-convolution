@@ -1,0 +1,50 @@
+# Blurred pixel matrix (B G R per pixel), image 5x8
+# (large image: showing top-left 8x5 block only, run with --dump-full for the whole matrix)
+y=0
+  x=0     B=65  G=52  R=55 
+  x=1     B=172 G=159 R=168
+  x=2     B=176 G=175 R=178
+  x=3     B=164 G=170 R=155
+  x=4     B=59  G=59  R=53 
+y=1
+  x=0     B=82  G=76  R=72 
+  x=1     B=215 G=220 R=223
+  x=2     B=220 G=235 R=235
+  x=3     B=205 G=226 R=210
+  x=4     B=75  G=77  R=70 
+y=2
+  x=0     B=89  G=92  R=75 
+  x=1     B=233 G=255 R=240
+  x=2     B=238 G=255 R=255
+  x=3     B=221 G=254 R=240
+  x=4     B=79  G=86  R=77 
+y=3
+  x=0     B=83  G=99  R=72 
+  x=1     B=220 G=255 R=233
+  x=2     B=225 G=255 R=252
+  x=3     B=208 G=252 R=245
+  x=4     B=72  G=84  R=78 
+y=4
+  x=0     B=81  G=102 R=71 
+  x=1     B=221 G=255 R=228
+  x=2     B=227 G=255 R=252
+  x=3     B=208 G=245 R=253
+  x=4     B=68  G=80  R=84 
+y=5
+  x=0     B=76  G=100 R=81 
+  x=1     B=214 G=255 R=236
+  x=2     B=231 G=255 R=255
+  x=3     B=220 G=233 R=255
+  x=4     B=73  G=74  R=89 
+y=6
+  x=0     B=62  G=86  R=79 
+  x=1     B=186 G=234 R=215
+  x=2     B=215 G=226 R=231
+  x=3     B=214 G=186 R=226
+  x=4     B=74  G=56  R=82 
+y=7
+  x=0     B=41  G=63  R=63 
+  x=1     B=129 G=167 R=159
+  x=2     B=162 G=159 R=165
+  x=3     B=171 G=126 R=156
+  x=4     B=62  G=36  R=57 

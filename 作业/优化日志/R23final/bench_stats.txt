@@ -1,0 +1,6 @@
+conv_pthread	threads=1	cpus=0	best=23.481	median=24.943	all=23.481,24.866,25.365,25.607,24.943,
+conv_pthread	threads=2	cpus=0,2	best=14.507	median=14.863	all=14.507,14.863,14.804,15.658,15.453,
+conv_pthread	threads=4	cpus=0,2,4,6	best=8.661	median=9.201	all=10.112,9.384,9.201,8.947,8.661,
+conv_omp	threads=1	cpus=0	best=24.279	median=24.409	all=24.315,24.279,24.409,25.250,24.926,
+conv_omp	threads=2	cpus=0,2	best=14.145	median=14.514	all=14.145,14.273,15.122,14.896,14.514,
+conv_omp	threads=4	cpus=0,2,4,6	best=8.725	median=9.046	all=9.096,9.218,8.947,9.046,8.725,

@@ -1,0 +1,14 @@
+kernel txt      : /home/hyc2452273/图片卷积/作业/优化日志/R23/edge_helper/pthread_w11_h1_blur.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/优化日志/R23/edge_helper/pthread_w11_h1_blur.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/优化日志/R23/edge_helper/pthread_w11_h1.bmp (11 x 1, 24bpp, stride=36)
+Output BMP      : /home/hyc2452273/图片卷积/作业/优化日志/R23/edge_helper/pthread_w11_h1_blur.bmp
+Threads         : 1
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0  rows [    0,    1)  conv =    0.016 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=1)     0.016 ms   (critical path = max thread)
+Conv   : sum/thread                 0.016 ms   (sum of per-thread times)
+Total time      :      0.118 ms
+Wall time (full) :      0.196 ms   (Total + 文本导出 + munmap)

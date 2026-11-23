@@ -1,0 +1,26 @@
+# Blurred pixel matrix (B G R per pixel), image 11x2
+# (large image: showing top-left 2x11 block only, run with --dump-full for the whole matrix)
+y=0
+  x=0     B=34  G=49  R=48 
+  x=1     B=52  G=61  R=58 
+  x=2     B=67  G=61  R=64 
+  x=3     B=71  G=59  R=65 
+  x=4     B=72  G=60  R=73 
+  x=5     B=70  G=68  R=77 
+  x=6     B=71  G=72  R=69 
+  x=7     B=68  G=74  R=58 
+  x=8     B=69  G=71  R=55 
+  x=9     B=61  G=62  R=49 
+  x=10    B=48  G=43  R=41 
+y=1
+  x=0     B=32  G=49  R=50 
+  x=1     B=52  G=61  R=59 
+  x=2     B=69  G=62  R=64 
+  x=3     B=74  G=58  R=64 
+  x=4     B=75  G=58  R=72 
+  x=5     B=70  G=67  R=78 
+  x=6     B=70  G=72  R=71 
+  x=7     B=67  G=73  R=60 
+  x=8     B=67  G=68  R=57 
+  x=9     B=57  G=59  R=51 
+  x=10    B=43  G=40  R=43 

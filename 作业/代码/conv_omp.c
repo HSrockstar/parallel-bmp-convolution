@@ -127,7 +127,7 @@ static void hpass_row(float *dst, const uint8_t *srow, int w)
         /* 内部区 [6, n3-6)：单趟 5 tap（与 R15 同构），步长 3 字节 */
         const float k0 = g_k1[0], k1 = g_k1[1], k2 = g_k1[2],
                     k3 = g_k1[3], k4 = g_k1[4];
-        for (int n = 2 * KRAD * 3; n < n3 - 2 * KRAD * 3; n++)
+        for (int n = KRAD * 3; n < n3 - KRAD * 3; n++)
             dst[n] = k0 * (float)srow[n - 6] + k1 * (float)srow[n - 3]
                    + k2 * (float)srow[n]     + k3 * (float)srow[n + 3]
                    + k4 * (float)srow[n + 6];
@@ -140,12 +140,12 @@ static void hpass_row(float *dst, const uint8_t *srow, int w)
             const int l0 = -d > 0 ? -d : 0;              /* 左窗起点 */
             const int r1 = n3 - d > n3 ? n3 : n3 - d;    /* 右窗终点（开） */
             if (kx == 0) {
-                for (int n = 0; n < 2 * KRAD * 3; n++) dst[n] = 0.0f;
-                for (int n = n3 - 2 * KRAD * 3; n < n3; n++) dst[n] = 0.0f;
+                for (int n = 0; n < KRAD * 3; n++) dst[n] = 0.0f;
+                for (int n = n3 - KRAD * 3; n < n3; n++) dst[n] = 0.0f;
             }
-            for (int n = l0; n < 2 * KRAD * 3; n++)
+            for (int n = l0; n < KRAD * 3; n++)
                 dst[n] += kv * (float)srow[n + d];
-            for (int n = n3 - 2 * KRAD * 3; n < n3 && n < r1; n++)
+            for (int n = n3 - KRAD * 3; n < n3 && n < r1; n++)
                 dst[n] += kv * (float)srow[n + d];
         }
         return;

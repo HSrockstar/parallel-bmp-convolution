@@ -1,0 +1,31 @@
+== 最终版本验卷记录（2026-11-21 19:06:21, 4 线程, R15 代码: vpass/hpass 单趟融合）==
+--- Pure_white / pthread ---
+[PASS] Shape test passed!
+[PASS] Similarity test passed!
+MSE result: 0.00
+Similarity rate: 100.00%
+--- Pure_white / omp ---
+[PASS] Shape test passed!
+[PASS] Similarity test passed!
+MSE result: 0.00
+Similarity rate: 100.00%
+--- Pure_black / pthread ---
+[PASS] Shape test passed!
+[PASS] Similarity test passed!
+MSE result: 0.00
+Similarity rate: 100.00%
+--- Pure_black / omp ---
+[PASS] Shape test passed!
+[PASS] Similarity test passed!
+MSE result: 0.00
+Similarity rate: 100.00%
+--- timg / pthread ---
+[PASS] Shape test passed!
+[PASS] Similarity test passed!
+MSE result: 0.00
+Similarity rate: 100.00%
+--- timg / omp ---
+[PASS] Shape test passed!
+[PASS] Similarity test passed!
+MSE result: 0.00
+Similarity rate: 100.00%

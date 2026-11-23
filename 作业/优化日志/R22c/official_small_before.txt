@@ -1,0 +1,13 @@
+MSE result: 0.00
+Similarity rate: 100.00%
+[PASS] Pure_white/pthread，日志=/home/hyc2452273/图片卷积/作业/代码/../优化日志/R23smallbase/verify_Pure_white_pthread.txt
+MSE result: 0.00
+Similarity rate: 100.00%
+[PASS] Pure_white/omp，日志=/home/hyc2452273/图片卷积/作业/代码/../优化日志/R23smallbase/verify_Pure_white_omp.txt
+MSE result: 0.00
+Similarity rate: 100.00%
+[PASS] Pure_black/pthread，日志=/home/hyc2452273/图片卷积/作业/代码/../优化日志/R23smallbase/verify_Pure_black_pthread.txt
+MSE result: 0.00
+Similarity rate: 100.00%
+[PASS] Pure_black/omp，日志=/home/hyc2452273/图片卷积/作业/代码/../优化日志/R23smallbase/verify_Pure_black_omp.txt
+check_small: OK (4/4 teacher checks)

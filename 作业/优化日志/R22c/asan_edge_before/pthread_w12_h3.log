@@ -1,0 +1,16 @@
+kernel txt      : /home/hyc2452273/图片卷积/作业/优化日志/R22c/asan_edge_before/pthread_w12_h3_blur.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/优化日志/R22c/asan_edge_before/pthread_w12_h3_blur.bmp.matrix.txt (top-left 20x20 block)
+================ Pthread BMP Gaussian Convolution ================
+Input           : /home/hyc2452273/图片卷积/作业/优化日志/R22c/asan_edge_before/pthread_w12_h3.bmp (12 x 3, 24bpp, stride=36)
+Output BMP      : /home/hyc2452273/图片卷积/作业/优化日志/R22c/asan_edge_before/pthread_w12_h3_blur.bmp
+Threads         : 3
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0  rows [    0,    1)  conv =    0.038 ms
+  thread 1  rows [    1,    2)  conv =    0.018 ms
+  thread 2  rows [    2,    3)  conv =    0.002 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=3)     0.038 ms   (critical path = max thread)
+Conv   : sum/thread                 0.058 ms   (sum of per-thread times)
+Total time      :      0.384 ms
+Wall time (full) :      0.546 ms   (Total + 文本导出 + munmap)

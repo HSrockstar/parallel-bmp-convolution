@@ -4,7 +4,7 @@ Pthread / OpenMP 两版并行高斯卷积。5×5 核（σ=1.5, r=2）、stride=1
 结果与教师验卷器（`filter2D(..., BORDER_CONSTANT)`）比对：**MSE=0.00，相似度 100.00%**
 （与 double 基准仅 36/28.3M 字节 ±1 平局差异）。
 
-优化迭代记录（R0–R16 + OpenMP 计时修复，含四次无收益探索的回退）见 [../优化日志.md](../优化日志.md)。
+优化迭代记录（R0–R23、R22c 正确性修复、OpenMP 计时修复及每次失败回退）见 [../优化日志.md](../优化日志.md)。R22/R23 连续两次未达双版本平均 T4  ≥1% 收益后，本轮已停止。
 
 ## 编译
 
@@ -55,7 +55,14 @@ CFLAGS：`-O3 -march=native -funroll-loops -ffp-contract=fast -Wall -std=c11`
 
 ```bash
 make check      # Pure_white.bmp 自测并过教师验卷器
+bash check_small.sh <新轮次>       # Pure_white/Pure_black × 两版，4 项教师检查
+bash check_round.sh <新轮次>       # timg × 两版，teacher + double 参考差异统计
+# 非均匀 BGR + 宽度 1–12 + 多个小高度 + BMP 行 padding；目录必须不存在
+python3 -I check_edges.py --pthread ./conv_pthread --omp ./conv_omp \
+    --work-dir ../优化日志/<新边界测试轮次>
 ```
+
+R22c 修复的是宽度 5–7 的左右 BGR 边界窗口；官方大图输出保持逐字节不变。`check_edges_asan.c` 用于精确分配独立行缓冲区后执行 ASan 检查，编译方式和失败前后的原始证据见 `../优化日志/R22c/README.md`。均匀官方图通过并不能代替这项测试。
 
 正式验收（验卷器在 `环境验证/`，已按附件原样编译）：
 
@@ -64,7 +71,7 @@ make check      # Pure_white.bmp 自测并过教师验卷器
 python3  ../../附件/.../测试程序/test_blur.py <原图> <你的模糊图>
 ```
 
-最终验卷记录：`../结果/final_verify.txt`（6/6 PASS，MSE=0.00）。
+最终验卷记录：`../结果/final_verify.txt`（R22c，6/6 PASS，MSE=0.00；小图回归双构建各 144 项通过）。
 
 ## Benchmark（加速比 / 效率）
 
@@ -86,14 +93,16 @@ best+median 留档 `bench_stats.txt`，原始输出逐轮留档到 `../优化日
 
 ## 最终数据（timg.bmp）
 
-第二轮迭代后（R21 = R19 连续 BGR + R21 fallocate，2026-11-22，A/B 交替安静窗实测）：
+当前保留版 R22c（2026-11-23，`bench_round.sh R23final both 5` 最优 Total time；性能路径同 R21，另含正确性修复）：
 
 | 版本 | T(1) ms | T(2) ms | T(4) ms | S(2) | S(4) | E(2) | E(4) |
 |------|---------|---------|---------|------|------|------|------|
-| Pthread | 24.5 | 14.6 | **~8.4–8.9** | 1.68 | 2.40 | 0.84 | 0.60 |
-| OpenMP  | 24.6 | 14.4 | **~9.2** | 1.70 | 2.68 | 0.85 | 0.67 |
+| Pthread | 23.481 | 14.507 | **8.661** | 1.6186 | 2.7111 | 0.8093 | 0.6778 |
+| OpenMP  | 24.279 | 14.145 | **8.725** | 1.7164 | 2.7827 | 0.8582 | 0.6957 |
 
-（当日共享机负载突发，官方 run_bench 行偏高，空闲期可复测正式口径。）
+R23 双输出垂直复用两版平均 T4 慢 0.83%，未保留；与 R22 一同触发“连续两次探索无正向收益停止”。第二轮 R21 的安静窗 T4 曾记录为约 8.4–8.9 / 9.2ms。
+
+这次官方 `run_bench.sh` 三次记录 T1/T2/T4 = Pthread 23.552/14.373/9.398ms、OpenMP 24.398/14.277/9.498ms。与上面的五次记录来自不同窗口，`bench_summary.md` 原样保存这次官方值，且每组完整样本均在，不据其宣称新一轮提速。
 
 第一轮最终（R15 代码，2026-11-21 实测，官方 3 次取最优）：
 
@@ -115,5 +124,8 @@ baseline（-O2 朴素实现）为 293.2/162.8/95.5 与 290.5/160.3/93.9 —— *
 | `run_bench.sh`   | 正式 1/2/4 核 benchmark + 加速比/效率汇总 |
 | `bench_round.sh` | 优化迭代用统一基准（缺省 5 次取最优 + best/median 留档，逐轮留档） |
 | `bench_ab.sh`    | 基线/候选交替对照（抗共享机负载突发，best+median） |
-| `check_round.sh` | 正确性门禁（教师验卷器 + 参考图逐字节比对） |
+| `check_round.sh` | 大图正确性门禁（教师验卷器 + 参考图逐字节比对） |
+| `check_small.sh` | 两张官方小图 × 两版的教师验卷；要求新轮次目录 |
+| `check_edges.py` | 非均匀窄图、BGR 边界与行 padding 的直接卷积回归 |
+| `check_edges_asan.c` | 独立单行堆分配 + ASan 的越界定位探针 |
 | `Makefile`       | `make` / `make check` / `make bench` / `make clean`（CC 钉住 gcc-11） |

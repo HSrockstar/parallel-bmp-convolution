@@ -1,129 +1,138 @@
-kernel txt      : /tmp/conv_bench_blur.bmp.kernel.txt
-matrix txt      : /tmp/conv_bench_blur.bmp.matrix.txt (top-left 20x20 block)
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.matrix.txt (top-left 20x20 block)
 ================ OpenMP BMP Gaussian Convolution ==================
-Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
-Output BMP      : /tmp/conv_bench_blur.bmp
+Input           : /home/hyc2452273/图片卷积/附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp
 Threads         : 1 (OMP_NUM_THREADS / default)
 ---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
-  thread 0                     conv =   27.268 ms
+  thread 0                     conv =   22.308 ms
 ---- timing ----
 I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
-Conv   : (parallel region, p=1)    27.268 ms   (critical path = max thread)
-Conv   : sum/thread                27.268 ms   (sum of per-thread times)
-Total time      :     29.098 ms
-kernel txt      : /tmp/conv_bench_blur.bmp.kernel.txt
-matrix txt      : /tmp/conv_bench_blur.bmp.matrix.txt (top-left 20x20 block)
+Conv   : (parallel region, p=1)    22.308 ms   (critical path = max thread)
+Conv   : sum/thread                22.308 ms   (sum of per-thread times)
+Total time      :     24.398 ms
+Wall time (full) :     25.612 ms   (Total + 文本导出 + munmap)
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.matrix.txt (top-left 20x20 block)
 ================ OpenMP BMP Gaussian Convolution ==================
-Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
-Output BMP      : /tmp/conv_bench_blur.bmp
+Input           : /home/hyc2452273/图片卷积/附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp
 Threads         : 1 (OMP_NUM_THREADS / default)
 ---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
-  thread 0                     conv =   27.655 ms
+  thread 0                     conv =   22.485 ms
 ---- timing ----
 I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
-Conv   : (parallel region, p=1)    27.655 ms   (critical path = max thread)
-Conv   : sum/thread                27.655 ms   (sum of per-thread times)
-Total time      :     29.294 ms
-kernel txt      : /tmp/conv_bench_blur.bmp.kernel.txt
-matrix txt      : /tmp/conv_bench_blur.bmp.matrix.txt (top-left 20x20 block)
+Conv   : (parallel region, p=1)    22.485 ms   (critical path = max thread)
+Conv   : sum/thread                22.485 ms   (sum of per-thread times)
+Total time      :     24.716 ms
+Wall time (full) :     25.977 ms   (Total + 文本导出 + munmap)
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.matrix.txt (top-left 20x20 block)
 ================ OpenMP BMP Gaussian Convolution ==================
-Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
-Output BMP      : /tmp/conv_bench_blur.bmp
+Input           : /home/hyc2452273/图片卷积/附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp
 Threads         : 1 (OMP_NUM_THREADS / default)
 ---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
-  thread 0                     conv =   27.272 ms
+  thread 0                     conv =   22.465 ms
 ---- timing ----
 I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
-Conv   : (parallel region, p=1)    27.272 ms   (critical path = max thread)
-Conv   : sum/thread                27.272 ms   (sum of per-thread times)
-Total time      :     28.806 ms
-kernel txt      : /tmp/conv_bench_blur.bmp.kernel.txt
-matrix txt      : /tmp/conv_bench_blur.bmp.matrix.txt (top-left 20x20 block)
+Conv   : (parallel region, p=1)    22.465 ms   (critical path = max thread)
+Conv   : sum/thread                22.465 ms   (sum of per-thread times)
+Total time      :     24.864 ms
+Wall time (full) :     26.133 ms   (Total + 文本导出 + munmap)
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.matrix.txt (top-left 20x20 block)
 ================ OpenMP BMP Gaussian Convolution ==================
-Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
-Output BMP      : /tmp/conv_bench_blur.bmp
+Input           : /home/hyc2452273/图片卷积/附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp
 Threads         : 2 (OMP_NUM_THREADS / default)
 ---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
-  thread 0                     conv =   15.031 ms
-  thread 1                     conv =   15.554 ms
+  thread 0                     conv =   12.235 ms
+  thread 1                     conv =   12.294 ms
 ---- timing ----
 I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
-Conv   : (parallel region, p=2)    15.554 ms   (critical path = max thread)
-Conv   : sum/thread                30.585 ms   (sum of per-thread times)
-Total time      :     17.354 ms
-kernel txt      : /tmp/conv_bench_blur.bmp.kernel.txt
-matrix txt      : /tmp/conv_bench_blur.bmp.matrix.txt (top-left 20x20 block)
+Conv   : (parallel region, p=2)    12.294 ms   (critical path = max thread)
+Conv   : sum/thread                24.529 ms   (sum of per-thread times)
+Total time      :     14.574 ms
+Wall time (full) :     15.764 ms   (Total + 文本导出 + munmap)
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.matrix.txt (top-left 20x20 block)
 ================ OpenMP BMP Gaussian Convolution ==================
-Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
-Output BMP      : /tmp/conv_bench_blur.bmp
+Input           : /home/hyc2452273/图片卷积/附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp
 Threads         : 2 (OMP_NUM_THREADS / default)
 ---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
-  thread 0                     conv =   14.895 ms
-  thread 1                     conv =   14.604 ms
+  thread 0                     conv =   11.794 ms
+  thread 1                     conv =   11.804 ms
 ---- timing ----
 I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
-Conv   : (parallel region, p=2)    14.895 ms   (critical path = max thread)
-Conv   : sum/thread                29.499 ms   (sum of per-thread times)
-Total time      :     17.054 ms
-kernel txt      : /tmp/conv_bench_blur.bmp.kernel.txt
-matrix txt      : /tmp/conv_bench_blur.bmp.matrix.txt (top-left 20x20 block)
+Conv   : (parallel region, p=2)    11.804 ms   (critical path = max thread)
+Conv   : sum/thread                23.598 ms   (sum of per-thread times)
+Total time      :     14.277 ms
+Wall time (full) :     15.452 ms   (Total + 文本导出 + munmap)
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.matrix.txt (top-left 20x20 block)
 ================ OpenMP BMP Gaussian Convolution ==================
-Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
-Output BMP      : /tmp/conv_bench_blur.bmp
+Input           : /home/hyc2452273/图片卷积/附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp
 Threads         : 2 (OMP_NUM_THREADS / default)
 ---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
-  thread 0                     conv =   14.376 ms
-  thread 1                     conv =   15.074 ms
+  thread 0                     conv =   12.712 ms
+  thread 1                     conv =   12.000 ms
 ---- timing ----
 I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
-Conv   : (parallel region, p=2)    15.074 ms   (critical path = max thread)
-Conv   : sum/thread                29.450 ms   (sum of per-thread times)
-Total time      :     16.724 ms
-kernel txt      : /tmp/conv_bench_blur.bmp.kernel.txt
-matrix txt      : /tmp/conv_bench_blur.bmp.matrix.txt (top-left 20x20 block)
+Conv   : (parallel region, p=2)    12.712 ms   (critical path = max thread)
+Conv   : sum/thread                24.712 ms   (sum of per-thread times)
+Total time      :     15.418 ms
+Wall time (full) :     16.548 ms   (Total + 文本导出 + munmap)
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.matrix.txt (top-left 20x20 block)
 ================ OpenMP BMP Gaussian Convolution ==================
-Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
-Output BMP      : /tmp/conv_bench_blur.bmp
+Input           : /home/hyc2452273/图片卷积/附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp
 Threads         : 4 (OMP_NUM_THREADS / default)
 ---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
-  thread 0                     conv =    8.191 ms
-  thread 1                     conv =    8.034 ms
-  thread 2                     conv =    8.666 ms
-  thread 3                     conv =    8.541 ms
+  thread 0                     conv =    6.842 ms
+  thread 1                     conv =    6.988 ms
+  thread 2                     conv =    6.563 ms
+  thread 3                     conv =    7.167 ms
 ---- timing ----
 I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
-Conv   : (parallel region, p=4)     8.666 ms   (critical path = max thread)
-Conv   : sum/thread                33.432 ms   (sum of per-thread times)
-Total time      :     10.402 ms
-kernel txt      : /tmp/conv_bench_blur.bmp.kernel.txt
-matrix txt      : /tmp/conv_bench_blur.bmp.matrix.txt (top-left 20x20 block)
+Conv   : (parallel region, p=4)     7.167 ms   (critical path = max thread)
+Conv   : sum/thread                27.560 ms   (sum of per-thread times)
+Total time      :      9.832 ms
+Wall time (full) :     10.990 ms   (Total + 文本导出 + munmap)
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.matrix.txt (top-left 20x20 block)
 ================ OpenMP BMP Gaussian Convolution ==================
-Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
-Output BMP      : /tmp/conv_bench_blur.bmp
+Input           : /home/hyc2452273/图片卷积/附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp
 Threads         : 4 (OMP_NUM_THREADS / default)
 ---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
-  thread 0                     conv =    8.335 ms
-  thread 1                     conv =    8.495 ms
-  thread 2                     conv =    7.971 ms
-  thread 3                     conv =    8.397 ms
+  thread 0                     conv =    6.439 ms
+  thread 1                     conv =    6.562 ms
+  thread 2                     conv =    7.057 ms
+  thread 3                     conv =    7.071 ms
 ---- timing ----
 I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
-Conv   : (parallel region, p=4)     8.495 ms   (critical path = max thread)
-Conv   : sum/thread                33.198 ms   (sum of per-thread times)
-Total time      :     10.792 ms
-kernel txt      : /tmp/conv_bench_blur.bmp.kernel.txt
-matrix txt      : /tmp/conv_bench_blur.bmp.matrix.txt (top-left 20x20 block)
+Conv   : (parallel region, p=4)     7.071 ms   (critical path = max thread)
+Conv   : sum/thread                27.130 ms   (sum of per-thread times)
+Total time      :      9.965 ms
+Wall time (full) :     11.035 ms   (Total + 文本导出 + munmap)
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp.matrix.txt (top-left 20x20 block)
 ================ OpenMP BMP Gaussian Convolution ==================
-Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
-Output BMP      : /tmp/conv_bench_blur.bmp
+Input           : /home/hyc2452273/图片卷积/附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../结果/bench_blur.bmp
 Threads         : 4 (OMP_NUM_THREADS / default)
 ---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
-  thread 0                     conv =    8.254 ms
-  thread 1                     conv =    8.539 ms
-  thread 2                     conv =    7.864 ms
-  thread 3                     conv =    8.240 ms
+  thread 0                     conv =    6.890 ms
+  thread 1                     conv =    6.927 ms
+  thread 2                     conv =    6.662 ms
+  thread 3                     conv =    7.085 ms
 ---- timing ----
 I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
-Conv   : (parallel region, p=4)     8.539 ms   (critical path = max thread)
-Conv   : sum/thread                32.897 ms   (sum of per-thread times)
-Total time      :     10.911 ms
+Conv   : (parallel region, p=4)     7.085 ms   (critical path = max thread)
+Conv   : sum/thread                27.563 ms   (sum of per-thread times)
+Total time      :      9.498 ms
+Wall time (full) :     10.573 ms   (Total + 文本导出 + munmap)
