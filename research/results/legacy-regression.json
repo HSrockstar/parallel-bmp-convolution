@@ -1,0 +1,41 @@
+{
+  "official_fixtures": [
+    {
+      "backend": "pthread",
+      "fixture": "Pure_black.bmp",
+      "equal_to_original": true,
+      "sha256": "8935ce8b294e4052c301b2c443965596293d10e4ec6e5c56550374ad9db69fce"
+    },
+    {
+      "backend": "pthread",
+      "fixture": "Pure_white.bmp",
+      "equal_to_original": true,
+      "sha256": "20d0984b0de53c84900f60f086e5da4743801b8bbf93b46c2230ce265fdfefa8"
+    },
+    {
+      "backend": "pthread",
+      "fixture": "timg.bmp",
+      "equal_to_original": true,
+      "sha256": "d5d9a8779570d3a1854daeaedda6e8cd4c534318be5146a8af02a8b2f507e1b1"
+    },
+    {
+      "backend": "omp",
+      "fixture": "Pure_black.bmp",
+      "equal_to_original": true,
+      "sha256": "8935ce8b294e4052c301b2c443965596293d10e4ec6e5c56550374ad9db69fce"
+    },
+    {
+      "backend": "omp",
+      "fixture": "Pure_white.bmp",
+      "equal_to_original": true,
+      "sha256": "20d0984b0de53c84900f60f086e5da4743801b8bbf93b46c2230ce265fdfefa8"
+    },
+    {
+      "backend": "omp",
+      "fixture": "timg.bmp",
+      "equal_to_original": true,
+      "sha256": "d5d9a8779570d3a1854daeaedda6e8cd4c534318be5146a8af02a8b2f507e1b1"
+    }
+  ],
+  "asan_hpass_widths": "1..12, both backends"
+}

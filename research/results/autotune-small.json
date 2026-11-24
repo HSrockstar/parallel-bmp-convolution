@@ -1,0 +1,413 @@
+{
+  "input": "/tmp/bmp-bench-small.bmp",
+  "affinity": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "winner": {
+    "method": "vfirst",
+    "tile": 128,
+    "threads": 1,
+    "median_wall_ms": 0.454646
+  },
+  "ranked": [
+    {
+      "median_ms": 0.454646,
+      "candidate": [
+        "vfirst",
+        128,
+        1
+      ],
+      "samples_ms": [
+        0.980656,
+        0.454646,
+        0.453484
+      ]
+    },
+    {
+      "median_ms": 0.458452,
+      "candidate": [
+        "avx512",
+        128,
+        1
+      ],
+      "samples_ms": [
+        0.458452,
+        0.779759,
+        0.413164
+      ]
+    },
+    {
+      "median_ms": 0.485562,
+      "candidate": [
+        "tiled",
+        512,
+        1
+      ],
+      "samples_ms": [
+        0.654493,
+        0.485562,
+        0.448657
+      ]
+    },
+    {
+      "median_ms": 0.499582,
+      "candidate": [
+        "tiled",
+        64,
+        1
+      ],
+      "samples_ms": [
+        0.522816,
+        0.494696,
+        0.499582
+      ]
+    },
+    {
+      "median_ms": 0.517379,
+      "candidate": [
+        "vfirst",
+        128,
+        2
+      ],
+      "samples_ms": [
+        0.607812,
+        0.508345,
+        0.517379
+      ]
+    },
+    {
+      "median_ms": 0.523288,
+      "candidate": [
+        "ring",
+        128,
+        1
+      ],
+      "samples_ms": [
+        0.523288,
+        0.511881,
+        0.593322
+      ]
+    },
+    {
+      "median_ms": 0.55206,
+      "candidate": [
+        "symmetric",
+        128,
+        1
+      ],
+      "samples_ms": [
+        0.694371,
+        0.55206,
+        0.446203
+      ]
+    },
+    {
+      "median_ms": 0.590998,
+      "candidate": [
+        "tiled",
+        256,
+        1
+      ],
+      "samples_ms": [
+        0.50497,
+        0.590998,
+        0.866889
+      ]
+    },
+    {
+      "median_ms": 0.594514,
+      "candidate": [
+        "ring",
+        128,
+        2
+      ],
+      "samples_ms": [
+        0.687041,
+        0.594514,
+        0.570348
+      ]
+    },
+    {
+      "median_ms": 0.596146,
+      "candidate": [
+        "tiled",
+        512,
+        2
+      ],
+      "samples_ms": [
+        0.522937,
+        0.596146,
+        0.720901
+      ]
+    },
+    {
+      "median_ms": 0.596727,
+      "candidate": [
+        "tiled",
+        32,
+        1
+      ],
+      "samples_ms": [
+        0.592991,
+        0.872567,
+        0.596727
+      ]
+    },
+    {
+      "median_ms": 0.601244,
+      "candidate": [
+        "tiled",
+        128,
+        1
+      ],
+      "samples_ms": [
+        0.563797,
+        0.614423,
+        0.601244
+      ]
+    },
+    {
+      "median_ms": 0.604508,
+      "candidate": [
+        "avx512",
+        128,
+        2
+      ],
+      "samples_ms": [
+        0.642123,
+        0.604508,
+        0.562486
+      ]
+    },
+    {
+      "median_ms": 0.60562,
+      "candidate": [
+        "avx2",
+        128,
+        2
+      ],
+      "samples_ms": [
+        0.634892,
+        0.562375,
+        0.60562
+      ]
+    },
+    {
+      "median_ms": 0.607152,
+      "candidate": [
+        "tiled",
+        128,
+        2
+      ],
+      "samples_ms": [
+        0.546181,
+        0.607152,
+        0.677487
+      ]
+    },
+    {
+      "median_ms": 0.612831,
+      "candidate": [
+        "tiled",
+        256,
+        2
+      ],
+      "samples_ms": [
+        0.71314,
+        0.612831,
+        0.523288
+      ]
+    },
+    {
+      "median_ms": 0.632811,
+      "candidate": [
+        "tiled",
+        64,
+        2
+      ],
+      "samples_ms": [
+        0.812817,
+        0.565891,
+        0.632811
+      ]
+    },
+    {
+      "median_ms": 0.645658,
+      "candidate": [
+        "tiled",
+        32,
+        2
+      ],
+      "samples_ms": [
+        0.645658,
+        0.675053,
+        0.615284
+      ]
+    },
+    {
+      "median_ms": 0.65896,
+      "candidate": [
+        "avx2",
+        128,
+        1
+      ],
+      "samples_ms": [
+        0.495245,
+        0.663155,
+        0.65896
+      ]
+    },
+    {
+      "median_ms": 0.734241,
+      "candidate": [
+        "ring",
+        128,
+        4
+      ],
+      "samples_ms": [
+        0.974277,
+        0.690987,
+        0.734241
+      ]
+    },
+    {
+      "median_ms": 0.754462,
+      "candidate": [
+        "tiled",
+        128,
+        4
+      ],
+      "samples_ms": [
+        0.993375,
+        0.688223,
+        0.754462
+      ]
+    },
+    {
+      "median_ms": 0.761372,
+      "candidate": [
+        "symmetric",
+        128,
+        2
+      ],
+      "samples_ms": [
+        0.761372,
+        1.086585,
+        0.53531
+      ]
+    },
+    {
+      "median_ms": 0.807841,
+      "candidate": [
+        "symmetric",
+        128,
+        4
+      ],
+      "samples_ms": [
+        0.807841,
+        1.225326,
+        0.617237
+      ]
+    },
+    {
+      "median_ms": 0.808352,
+      "candidate": [
+        "tiled",
+        32,
+        4
+      ],
+      "samples_ms": [
+        1.121645,
+        0.808352,
+        0.703315
+      ]
+    },
+    {
+      "median_ms": 0.837665,
+      "candidate": [
+        "avx512",
+        128,
+        4
+      ],
+      "samples_ms": [
+        1.176156,
+        0.837665,
+        0.806749
+      ]
+    },
+    {
+      "median_ms": 0.839427,
+      "candidate": [
+        "vfirst",
+        128,
+        4
+      ],
+      "samples_ms": [
+        1.150007,
+        0.709595,
+        0.839427
+      ]
+    },
+    {
+      "median_ms": 0.894019,
+      "candidate": [
+        "avx2",
+        128,
+        4
+      ],
+      "samples_ms": [
+        1.023882,
+        0.801501,
+        0.894019
+      ]
+    },
+    {
+      "median_ms": 0.923853,
+      "candidate": [
+        "tiled",
+        512,
+        4
+      ],
+      "samples_ms": [
+        1.062468,
+        0.923853,
+        0.648403
+      ]
+    },
+    {
+      "median_ms": 1.036098,
+      "candidate": [
+        "tiled",
+        256,
+        4
+      ],
+      "samples_ms": [
+        1.036098,
+        1.579908,
+        0.763194
+      ]
+    },
+    {
+      "median_ms": 1.168707,
+      "candidate": [
+        "tiled",
+        64,
+        4
+      ],
+      "samples_ms": [
+        0.624297,
+        1.168707,
+        1.185122
+      ]
+    }
+  ],
+  "note": "winner applies to this image, build, host, cache and I/O conditions only"
+}

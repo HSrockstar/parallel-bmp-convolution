@@ -42,7 +42,7 @@
  * 计时：clock_gettime(CLOCK_MONOTONIC) 计全程墙钟；逐线程打印
  *       读条带/卷积（并行段）/写条带分段耗时，并行段关键路径 = max(各线程卷积时间)。
  */
-#define _POSIX_C_SOURCE 199309L   /* clock_gettime / CLOCK_MONOTONIC */
+#define _POSIX_C_SOURCE 200809L   /* clock_gettime / CLOCK_MONOTONIC */
 #define _DEFAULT_SOURCE          /* O_DIRECT 等扩展在本文件未用，open/pread 需 POSIX */
 #include <stdio.h>
 #include <stdlib.h>
@@ -90,49 +90,13 @@ static double now_sec(void)
 
 /* ---------------- BMP 头解析 / 头写出 ---------------- */
 /* R2/R5: 像素按文件原始行序就地处理（核垂直对称 ⇒ 免翻转），逐条带 pread/pwrite */
-typedef struct {
-    int w, h;                /* 图像宽、高 */
-    int stride;              /* 每行字节数（4 字节对齐，含尾部填充） */
-    int topdown;             /* 1: 行序自上而下（文件负高度）；0: 自下而上 */
-    off_t data_off;          /* 文件内像素数据起始偏移 */
-} BmpInfo;
-
-static int bmp_parse_header(const uint8_t hdr[54], BmpInfo *b)
-{
-    if (hdr[0] != 'B' || hdr[1] != 'M') return -1;
-    uint32_t off      = *(uint32_t *)&hdr[10];
-    int32_t  w        = *(int32_t *)&hdr[18];
-    int32_t  hraw     = *(int32_t *)&hdr[22];
-    uint16_t bpp      = *(uint16_t *)&hdr[28];
-    uint32_t comp     = *(uint32_t *)&hdr[30];
-    if (bpp != 24 || comp != 0) return -1;
-    b->w = w;
-    b->h = hraw > 0 ? hraw : -hraw;
-    b->stride = (w * 3 + 3) & ~3;
-    b->topdown = (hraw < 0);
-    b->data_off = (off_t)off;
-    return 0;
-}
-
-static void bmp_make_header(const BmpInfo *b, uint8_t hdr[54])
-{
-    uint32_t datasize = (uint32_t)b->stride * b->h;
-    memset(hdr, 0, 54);
-    hdr[0] = 'B'; hdr[1] = 'M';
-    *(uint32_t *)&hdr[2]  = 54 + datasize;         /* bfSize */
-    *(uint32_t *)&hdr[10] = 54;                    /* bfOffBits */
-    *(uint32_t *)&hdr[14] = 40;                    /* biSize = BITMAPINFOHEADER */
-    *(int32_t  *)&hdr[18] = b->w;
-    *(int32_t  *)&hdr[22] = b->topdown ? -b->h : b->h;  /* 与输入同向，保证不镜像 */
-    *(uint16_t *)&hdr[26] = 1;                     /* biPlanes */
-    *(uint16_t *)&hdr[28] = 24;                    /* biBitCount */
-    *(uint32_t *)&hdr[34] = datasize;              /* biSizeImage */
-}
+#include "bmp_safe.h"
 
 /* ---------------- Pthread 并行卷积（条带级流水线） ---------------- */
 typedef struct {
     int tid;
     int y0, y1;              /* 该线程负责的输出行范围 [y0, y1) */
+    int error;
     double conv_ms;          /* 该线程卷积（并行段，含输入/输出映射按需缺页）时间 */
 } ThreadArg;
 
@@ -197,12 +161,12 @@ static inline int slot5(int r) { return ((r % 5) + 5) % 5; }   /* 行号 → 环
 /* 分离核卷积一个输出行条带 [y0,y1)。
  * src 为本线程条带缓冲首址，base 为其对应的全局行号；全局行 r 的源数据在
  * src + (r-base)*stride，r 超出 [base, base+nrows) 视为越界（零填充）。 */
-static void conv_band(const uint8_t *src, int base, int nrows,
+static int conv_band(const uint8_t *src, int base, int nrows,
                       uint8_t *dst, int w, int stride, int y0, int y1)
 {
     const size_t sn = (size_t)w * 3;                  /* 每行有效字节数（H 槽步长） */
     float *hb = malloc(5 * sn * sizeof(float));       /* 5 槽 × 3w float（~245KB, L2） */
-    if (!hb) return;
+    if (!hb) return -1;
 
     /* 初始化窗口行 [y0-2, y0+3) */
     for (int i = 0; i < 5; i++) {
@@ -229,12 +193,14 @@ static void conv_band(const uint8_t *src, int base, int nrows,
             d[n] = o < 0 ? 0 : (o > 255 ? 255 : o);
         }
         /* 下一行滑入窗口：H(y+3) */
+        if (y + 1 == y1) break; /* No unused final horizontal row. */
         int rr = y + KRAD + 1;
         hpass_row(hb + (size_t)slot5(rr) * sn,
                   (rr < base + nrows) ? src + (size_t)(rr - base) * stride : NULL,
                   w);
     }
     free(hb);
+    return 0;
 }
 
 static void *thread_main(void *p)
@@ -250,7 +216,7 @@ static void *thread_main(void *p)
     const uint8_t *src = g_in_map + g_bmp.data_off + (size_t)y0c * stride;
 
     double t0 = now_sec();
-    conv_band(src, y0c, y1c - y0c, g_out, w, stride, y0, y1);
+    arg->error = conv_band(src, y0c, y1c - y0c, g_out, w, stride, y0, y1);
     arg->conv_ms = (now_sec() - t0) * 1000.0;
     return NULL;
 }
@@ -314,7 +280,7 @@ int main(int argc, char **argv)
     int dump_full = 0;
     for (int i = 3; i < argc; i++) {
         if (strcmp(argv[i], "--dump-full") == 0) dump_full = 1;
-        else nthreads = atoi(argv[i]);
+        else if (bmp_positive_int(argv[i], &nthreads)) { fprintf(stderr, "invalid threads/option\n"); return 1; }
     }
     if (nthreads < 1) nthreads = 1;
 
@@ -330,7 +296,8 @@ int main(int argc, char **argv)
         return 1;
     }
     const int w = g_bmp.w, h = g_bmp.h, stride = g_bmp.stride;
-    off_t in_size = lseek(g_in_fd, 0, SEEK_END);
+    off_t in_size;
+    if (bmp_file_size(g_in_fd, &g_bmp, &in_size)) { fprintf(stderr, "truncated/invalid BMP\n"); close(g_in_fd); return 1; }
     g_in_map = mmap(NULL, (size_t)in_size, PROT_READ, MAP_SHARED, g_in_fd, 0);
     if (g_in_map == MAP_FAILED) { fprintf(stderr, "mmap input failed\n"); return 1; }
 
@@ -338,23 +305,21 @@ int main(int argc, char **argv)
      *    卷积结果直接写入映射（免 malloc 输出缓冲与 pwrite 拷贝） */
     uint8_t ohdr[54];
     bmp_make_header(&g_bmp, ohdr);
-    g_out_fd = open(out_path, O_RDWR | O_CREAT | O_TRUNC, 0644);
+    g_out_fd = bmp_open_output(out_path, g_in_fd);
     if (g_out_fd < 0) { fprintf(stderr, "cannot create %s\n", out_path); return 1; }
-    g_out_mapsize = (size_t)g_bmp.data_off + (size_t)stride * h;
+    g_out_mapsize = 54 + (size_t)stride * h;
     if (ftruncate(g_out_fd, (off_t)g_out_mapsize) != 0) {
         fprintf(stderr, "ftruncate failed\n"); return 1;
     }
-    if (posix_fallocate(g_out_fd, 0, (off_t)g_out_mapsize) != 0) {  /* R21: 预分配物理块，块分配移出并行缺页路径 */
+    if (bmp_preallocate(g_out_fd, (off_t)g_out_mapsize) != 0) {  /* R21: 预分配物理块，块分配移出并行缺页路径 */
         fprintf(stderr, "fallocate failed\n"); return 1;
     }
     if (pwrite(g_out_fd, ohdr, 54, 0) != 54) { fprintf(stderr, "write header failed\n"); return 1; }
     g_out_map = mmap(NULL, g_out_mapsize, PROT_READ | PROT_WRITE, MAP_SHARED, g_out_fd, 0);
     if (g_out_map == MAP_FAILED) { fprintf(stderr, "mmap output failed\n"); return 1; }
-    g_out = g_out_map + g_bmp.data_off;
+    g_out = g_out_map + 54;
     {   /* 头部与像素区之间的间隙及行尾填充字节清零（本实验图片均为 0，通用性保险） */
         int padlen = stride - w * 3;
-        if (g_bmp.data_off > 54)
-            memset(g_out_map + 54, 0, (size_t)g_bmp.data_off - 54);
         if (padlen)
             for (int y = 0; y < h; y++)
                 memset(g_out + (size_t)y * stride + w * 3, 0, (size_t)padlen);
@@ -364,16 +329,23 @@ int main(int argc, char **argv)
     if (nthreads > h) nthreads = h;
     ThreadArg *args = calloc((size_t)nthreads, sizeof(ThreadArg));
     pthread_t *tids  = calloc((size_t)nthreads, sizeof(pthread_t));
+    if (!args || !tids) { fprintf(stderr,"thread allocation failed\n"); return 1; }
     int chunk = h / nthreads, rem = h % nthreads;
 
     for (int i = 0; i < nthreads; i++) {
         args[i].tid = i;
         args[i].y0  = i * chunk + (i < rem ? i : rem);
         args[i].y1  = args[i].y0 + chunk + (i < rem ? 1 : 0);
-        pthread_create(&tids[i], NULL, thread_main, &args[i]);
+        int e = pthread_create(&tids[i], NULL, thread_main, &args[i]);
+        if (e) {
+            for (int j=0;j<i;j++) pthread_join(tids[j],NULL);
+            fprintf(stderr,"pthread_create: %s\n",strerror(e)); return 1;
+        }
     }
     for (int i = 0; i < nthreads; i++)
-        pthread_join(tids[i], NULL);
+        if (pthread_join(tids[i], NULL)) { fprintf(stderr,"pthread_join failed\n"); return 1; }
+    for (int i=0;i<nthreads;i++)
+        if (args[i].error) { fprintf(stderr,"convolution allocation failed\n"); return 1; }
 
     close(g_in_fd);
     close(g_out_fd);

@@ -74,44 +74,7 @@ static const float g_k1[KSIZE] = {  /* R6: float32 —— 8 宽向量 */
 
 /* ---------------- BMP 头解析 / 头写出 ---------------- */
 /* R2/R5: 像素按文件原始行序就地处理（核垂直对称 ⇒ 免翻转），逐条带 pread/pwrite */
-typedef struct {
-    int w, h;
-    int stride;              /* 每行字节数（4 字节对齐，含尾部填充） */
-    int topdown;             /* 1: 行序自上而下（文件负高度）；0: 自下而上 */
-    off_t data_off;          /* 文件内像素数据起始偏移 */
-} BmpInfo;
-
-static int bmp_parse_header(const uint8_t hdr[54], BmpInfo *b)
-{
-    if (hdr[0] != 'B' || hdr[1] != 'M') return -1;
-    uint32_t off      = *(uint32_t *)&hdr[10];
-    int32_t  w        = *(int32_t *)&hdr[18];
-    int32_t  hraw     = *(int32_t *)&hdr[22];
-    uint16_t bpp      = *(uint16_t *)&hdr[28];
-    uint32_t comp     = *(uint32_t *)&hdr[30];
-    if (bpp != 24 || comp != 0) return -1;
-    b->w = w;
-    b->h = hraw > 0 ? hraw : -hraw;
-    b->stride = (w * 3 + 3) & ~3;
-    b->topdown = (hraw < 0);
-    b->data_off = (off_t)off;
-    return 0;
-}
-
-static void bmp_make_header(const BmpInfo *b, uint8_t hdr[54])
-{
-    uint32_t datasize = (uint32_t)b->stride * b->h;
-    memset(hdr, 0, 54);
-    hdr[0] = 'B'; hdr[1] = 'M';
-    *(uint32_t *)&hdr[2]  = 54 + datasize;
-    *(uint32_t *)&hdr[10] = 54;
-    *(uint32_t *)&hdr[14] = 40;
-    *(int32_t  *)&hdr[18] = b->w;
-    *(int32_t  *)&hdr[22] = b->topdown ? -b->h : b->h;
-    *(uint16_t *)&hdr[26] = 1;
-    *(uint16_t *)&hdr[28] = 24;
-    *(uint32_t *)&hdr[34] = datasize;
-}
+#include "bmp_safe.h"
 
 /* ---------------- 分离核卷积 ---------------- */
 /* R19: 连续 BGR 单布局 —— 三通道共用同一 1D 核 ⇒ 每行视作长度 3w 的字节
@@ -165,12 +128,12 @@ static void hpass_row(float *dst, const uint8_t *srow, int w)
 
 static inline int slot5(int r) { return ((r % 5) + 5) % 5; }
 
-static void conv_band(const uint8_t *src, int base, int nrows,
+static int conv_band(const uint8_t *src, int base, int nrows,
                       uint8_t *dst, int w, int stride, int y0, int y1)
 {
     const size_t sn = (size_t)w * 3;                  /* 每行有效字节数（H 槽步长） */
     float *hb = malloc(5 * sn * sizeof(float));       /* 5 槽 × 3w float（~245KB, L2） */
-    if (!hb) return;
+    if (!hb) return -1;
 
     for (int i = 0; i < 5; i++) {
         int r = y0 + i - KRAD;
@@ -195,12 +158,14 @@ static void conv_band(const uint8_t *src, int base, int nrows,
             int o = (int)(v + 0.5f);
             d[n] = o < 0 ? 0 : (o > 255 ? 255 : o);
         }
+        if (y + 1 == y1) break; /* No unused final horizontal row. */
         int rr = y + KRAD + 1;
         hpass_row(hb + (size_t)slot5(rr) * sn,
                   (rr < base + nrows) ? src + (size_t)(rr - base) * stride : NULL,
                   w);
     }
     free(hb);
+    return 0;
 }
 
 /* ---------------- 结果导出（卷积核 + 像素矩阵 txt） ---------------- */
@@ -265,7 +230,7 @@ int main(int argc, char **argv)
     int dump_full = 0;
     for (int i = 3; i < argc; i++) {
         if (strcmp(argv[i], "--dump-full") == 0) dump_full = 1;
-        else if (atoi(argv[i]) > 0) nthreads = atoi(argv[i]);
+        else if (bmp_positive_int(argv[i], &nthreads)) { fprintf(stderr, "invalid threads/option\n"); return 1; }
     }
     if (nthreads > 0) omp_set_num_threads(nthreads);
 
@@ -282,7 +247,8 @@ int main(int argc, char **argv)
         return 1;
     }
     const int w = bmp.w, h = bmp.h, stride = bmp.stride;
-    off_t in_size = lseek(in_fd, 0, SEEK_END);
+    off_t in_size;
+    if (bmp_file_size(in_fd, &bmp, &in_size)) { fprintf(stderr, "truncated/invalid BMP\n"); close(in_fd); return 1; }
     uint8_t *in_map = mmap(NULL, (size_t)in_size, PROT_READ, MAP_SHARED, in_fd, 0);
     if (in_map == MAP_FAILED) { fprintf(stderr, "mmap input failed\n"); return 1; }
 
@@ -290,41 +256,41 @@ int main(int argc, char **argv)
      *    卷积结果直接写入映射（免 malloc 输出缓冲与 pwrite 拷贝） */
     uint8_t ohdr[54];
     bmp_make_header(&bmp, ohdr);
-    int out_fd = open(out_path, O_RDWR | O_CREAT | O_TRUNC, 0644);
+    int out_fd = bmp_open_output(out_path, in_fd);
     if (out_fd < 0) { fprintf(stderr, "cannot create %s\n", out_path); return 1; }
-    size_t out_mapsize = (size_t)bmp.data_off + (size_t)stride * h;
+    size_t out_mapsize = 54 + (size_t)stride * h;
     if (ftruncate(out_fd, (off_t)out_mapsize) != 0) {
         fprintf(stderr, "ftruncate failed\n"); return 1;
     }
-    if (posix_fallocate(out_fd, 0, (off_t)out_mapsize) != 0) {  /* R21: 预分配物理块 */
+    if (bmp_preallocate(out_fd, (off_t)out_mapsize) != 0) {  /* R21: 预分配物理块 */
         fprintf(stderr, "fallocate failed\n"); return 1;
     }
     if (pwrite(out_fd, ohdr, 54, 0) != 54) { fprintf(stderr, "write header failed\n"); return 1; }
     uint8_t *out_map = mmap(NULL, out_mapsize, PROT_READ | PROT_WRITE, MAP_SHARED, out_fd, 0);
     if (out_map == MAP_FAILED) { fprintf(stderr, "mmap output failed\n"); return 1; }
-    uint8_t *out = out_map + bmp.data_off;
+    uint8_t *out = out_map + 54;
     {   /* 头部与像素区之间的间隙及行尾填充字节清零（本实验图片均为 0，通用性保险） */
         int padlen = stride - w * 3;
-        if (bmp.data_off > 54)
-            memset(out_map + 54, 0, (size_t)bmp.data_off - 54);
         if (padlen)
             for (int y = 0; y < h; y++)
                 memset(out + (size_t)y * stride + w * 3, 0, (size_t)padlen);
     }
 
     /* 3. 并行：各线程在自己的条带上卷积（源/目的均为文件映射） */
+    if (omp_get_max_threads() > h) omp_set_num_threads(h);
     int maxt = omp_get_max_threads();
     double *conv_ms = calloc((size_t)maxt, sizeof(double));
+    if (!conv_ms) { fprintf(stderr,"thread allocation failed\n"); return 1; }
+    int error = 0;
     int np_actual = 0;                        /* 并行区实际线程数（用于打印） */
 
-    #pragma omp parallel
+    #pragma omp parallel reduction(|:error)
     {
         int tid = omp_get_thread_num();
         int np  = omp_get_num_threads();
         if (tid == 0) np_actual = np;
-        int chunk = (h + np - 1) / np;
-        int y0 = tid * chunk;
-        int y1 = y0 + chunk;
+        int y0 = (int)((int64_t)h * tid / np);
+        int y1 = (int)((int64_t)h * (tid + 1) / np);
         if (y1 > h) y1 = h;
         if (y0 < h) {
             /* R8: 源条带直接取输入映射（免 pread 拷贝），输出直接写输出映射
@@ -333,11 +299,12 @@ int main(int argc, char **argv)
             int y1c = y1 + KRAD > h ? h : y1 + KRAD;
             const uint8_t *src = in_map + bmp.data_off + (size_t)y0c * stride;
             double t0 = omp_get_wtime();
-            conv_band(src, y0c, y1c - y0c, out, w, stride, y0, y1);
+            error |= conv_band(src, y0c, y1c - y0c, out, w, stride, y0, y1);
             conv_ms[tid] = (omp_get_wtime() - t0) * 1000.0;
         }
     }
 
+    if (error) { fprintf(stderr,"convolution allocation failed\n"); return 1; }
     close(in_fd);
     close(out_fd);
     double total_ms = (omp_get_wtime() - t_all0) * 1000.0;

@@ -1,0 +1,12 @@
+{
+  "passed_cases": 309,
+  "approximation_max_errors": {
+    "boxes": 19.0,
+    "extended-boxes": 23.0,
+    "binomial": 31.0,
+    "am-recursive": 23.0,
+    "deriche": 34.0,
+    "vyv": 34.0,
+    "downsample": 75.0
+  }
+}

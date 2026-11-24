@@ -21,3 +21,12 @@ __pycache__/
 
 # ZCode 本地会话数据（不入库）
 .zcode/
+
+# Reproducible convolution research executables / temporary output
+research/conv_lab_pthread
+research/conv_lab_omp
+research/conv_cuda
+research/*.o
+research/vectorization.txt
+research/*.bmp
+research/test_buffers

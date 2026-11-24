@@ -22,10 +22,10 @@ CHECKER := ../../环境验证/test
 
 all: conv_pthread conv_omp
 
-conv_pthread: conv_pthread.c
+conv_pthread: conv_pthread.c bmp_safe.h
 	$(CC) $(CFLAGS) $< -o $@ $(LD_PTHREAD)
 
-conv_omp: conv_omp.c
+conv_omp: conv_omp.c bmp_safe.h
 	$(CC) $(CFLAGS) -fopenmp $< -o $@
 
 # 自测：全白图 + 4 线程

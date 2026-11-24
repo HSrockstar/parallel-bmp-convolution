@@ -1,0 +1,41 @@
+{
+  "passed_cases": 882,
+  "methods": [
+    "ring",
+    "symmetric",
+    "tiled",
+    "vfirst",
+    "box",
+    "prefix",
+    "q15",
+    "winograd",
+    "avx2",
+    "avx512",
+    "direct",
+    "sym2d",
+    "exact-int",
+    "lut",
+    "rank3",
+    "fft",
+    "overlap-save"
+  ],
+  "differing_bytes_across_main_cases": {
+    "ring": 0,
+    "symmetric": 0,
+    "tiled": 0,
+    "vfirst": 0,
+    "box": 0,
+    "prefix": 0,
+    "q15": 4,
+    "winograd": 0,
+    "avx2": 0,
+    "avx512": 0,
+    "direct": 0,
+    "sym2d": 0,
+    "exact-int": 0,
+    "lut": 0,
+    "rank3": 0,
+    "fft": 0,
+    "overlap-save": 0
+  }
+}

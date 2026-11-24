@@ -5,6 +5,19 @@
 （OpenCV `filter2D(..., BORDER_CONSTANT)`）比对，要求相似度 > 99%（最终实现 MSE=0.00、
 相似度 100.00%，与 double 基准逐像素仅 36/28.3M 字节的 ±1 平局差异）。
 
+## 2026-11-24 调研与算法实验
+
+新增 [完整调研、工程清单与实测报告](research/OPTIMIZATION_RESEARCH.md) 和 [可运行代码说明](research/README.md)。包含 17 个 Pthread/OpenMP CPU 方法、17 个 NumPy/SciPy 对照入口、3 个待 CUDA 实机验证的 GPU 方法，以及随机交错基准和自动调参。原有两个作业程序已修复 BMP 校验、非标准像素偏移、同文件覆盖和错误传播问题。
+
+```bash
+make -C research
+research/conv_lab_pthread --list
+research/conv_lab_pthread input.bmp output.bmp --method avx2 --threads 4
+python3 research/test_methods.py
+```
+
+历史 R0–R23 数据与本次 AMD EPYC / GCC 14.2 的实验分开保存。以下内容描述历史实验；新增实验与限制以调研报告为准。
+
 完整作业要求见 [作业要求.md](作业要求.md)；**优化过程全记录见 [作业/优化日志.md](作业/优化日志.md)**。
 现覆盖 R0–R23 与 R22c 正确性修复，含每轮原理、改动、验证、原始数据、保留/回退理由和停止条件。当前性能设计为 R21；R22/R23 是本轮连续两次未达收益的探索，已按用户要求停止。
 
