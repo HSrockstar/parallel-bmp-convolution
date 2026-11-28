@@ -38,3 +38,11 @@ research/*.o
 research/vectorization.txt
 research/*.bmp
 research/test_buffers
+
+# O2 整改后的可选分析产物与各轮大图，文本测评日志保留
+作业/代码/conv_pthread_opt
+作业/代码/conv_omp_opt
+作业/结果/O2首测_*/*.bmp
+作业/结果/O2首测_*/*.bmp.kernel.txt
+作业/结果/O2首测_*/*.bmp.matrix.txt
+作业/结果/O2首测_*/teacher_checker

@@ -1,9 +1,13 @@
 # Parallel BMP Convolution（Pthread / OpenMP 图像并行卷积）
 
 并行计算课程作业：从 BMP 图片读取像素，用 **5×5 高斯核（σ=1.5）、stride=1、边缘常数 0 填充**
-进行模糊卷积，分别以 **Pthread** 与 **OpenMP** 两种方式并行实现，并与教师验卷器
-（OpenCV `filter2D(..., BORDER_CONSTANT)`）比对，要求相似度 > 99%（最终实现 MSE=0.00、
-相似度 100.00%，与 double 基准逐像素仅 36/28.3M 字节的 ±1 平局差异）。
+进行模糊卷积，分别以 Pthread 和 OpenMP 并行实现，并通过教师相似度大于 99% 的验卷。实际采用近似分离核；验卷显示的 MSE 和相似度保留两位小数，不代表逐像素完全相同。
+
+## 2026-11-28 默认 O2 入口
+
+`make`、`make bench`、`make official-run` 现已统一到默认 O2 构建和首次测评。直接运行两个程序默认导出完整像素矩阵；文本失败会返回非零，验卷失败会中止测评。具体命令与计时边界见 [代码说明](作业/代码/README.md)。
+
+老师未提供完整编译运行命令。默认四线程是对应四核评分的实现选择，不绑核只是普通运行基线，不是教师禁令；需要时可在外层 `taskset -c 0,2,4,6` 另测物理 P 核限定结果。原有优化算法保留，本轮未写实验报告或填写提交表格。
 
 ## 2026-11-24 调研与算法实验
 
@@ -40,13 +44,13 @@ python3 research/test_methods.py
 
 ```bash
 cd 作业/代码
-make                       # 编译 conv_pthread 和 conv_omp
+make                       # 默认 gcc -O2，编译 conv_pthread 和 conv_omp
 
-./conv_pthread <input.bmp> <output.bmp> [threads] [--dump-full]
-./conv_omp     <input.bmp> <output.bmp> [threads] [--dump-full]
+./conv_pthread <input.bmp> <output.bmp> [threads] [--dump-preview]
+./conv_omp     <input.bmp> <output.bmp> [threads] [--dump-preview]
 
 make check                 # Pure_white.bmp 自测并过教师验卷器
-make bench                 # 1/2/4 核 benchmark + 加速比/效率汇总（结果存 ../结果/）
+make bench                 # O2 首次测评 + 1/2/4 线程加速比/效率，存入新结果目录
 make official-run          # 2026-11-28 测评口径：plain gcc -O2 + 首次运行 + 教师验卷
 ```
 
@@ -54,7 +58,9 @@ make official-run          # 2026-11-28 测评口径：plain gcc -O2 + 首次运
 
 > **2026-11-28 测评标准更新**：老师公告改为“最朴素 O2 编译 + 固定输入输出 + 统一编译运行指令 + 只记录第一次测评”。
 > 下表 8.6/8.7 ms 是 `-O3 -march=native`、多次取最优的**优化分析口径**，**不是**新标准下的成绩口径。
-> 新标准实测：不绑核约 23–27 ms，绑 4 个物理 P 核约 19 ms（取较快版本），仍快于去年第一 0.059117 s。
+> 当前 AVX2 主代码在 plain `-O2` 下的首测（2026-11-28 12:51）：不绑核 Pthread 12.041 ms / OpenMP 12.271 ms；
+> `taskset -c 0,2,4,6` 五次中位约 8.9 / 8.4 ms；仍快于去年第一 0.059117 s。
+> 此前标量版本的 23–27 / 19 ms 与 pragma 方案见 [作业/测评标准对齐.md](作业/测评标准对齐.md)。
 > 完整自检、逐条对照与原始数据见 [作业/测评标准对齐.md](作业/测评标准对齐.md)。
 
 **当前保留版（R22c，2026-11-23，`bench_round.sh R23final both 5` 最优 Total time）：**

@@ -1,0 +1,8 @@
+O2 first-run results; no best-of selection; milliseconds
+version threads total_ms conv_ms full_ms S_total E_total S_conv E_conv
+pthread  1 26.334 25.608 58.012 1.0000 1.0000 1.0000 1.0000
+pthread  2 19.001 18.321 50.439 1.3859 0.6930 1.3977 0.6989
+pthread  4 12.041 11.432 49.201 2.1870 0.5468 2.2400 0.5600
+omp      1 40.520 40.038 69.239 1.0000 1.0000 1.0000 1.0000
+omp      2 23.018 13.842 53.651 1.7604 0.8802 2.8925 1.4463
+omp      4 12.271 11.546 47.155 3.3021 0.8255 3.4677 0.8669

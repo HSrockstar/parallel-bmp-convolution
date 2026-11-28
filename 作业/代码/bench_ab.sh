@@ -58,6 +58,8 @@ ab_version() {  # $1=pthread|omp
         echo "# date $(date '+%F %T')   loadavg $(cat /proc/loadavg)"
         echo "# base=$BASE"
         echo "# cand=$CAND"
+        echo "# analysis only; current candidate build commands:"
+        make -Bn -C "$PROG_DIR" all
     } > "$LOG"
     : > "$RAW"
     local cfg th cpus t

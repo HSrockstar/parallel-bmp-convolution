@@ -1,143 +1,77 @@
-# BMP 图像卷积作业 —— 代码目录（最终优化版）
+# BMP 图像卷积代码与 O2 测评入口
 
-Pthread / OpenMP 两版并行高斯卷积。5×5 核（σ=1.5, r=2）、stride=1、边缘常数 0 填充，
-结果与教师验卷器（`filter2D(..., BORDER_CONSTANT)`）比对：**MSE=0.00，相似度 100.00%**
-（与 double 基准仅 36/28.3M 字节 ±1 平局差异）。
+本目录提供 Pthread 和 OpenMP 两个 BMP 高斯卷积实现。默认编译使用系统 GCC 的朴素 `-O2`，默认运行生成 BMP、完整卷积核文本和完整像素矩阵文本。
 
-优化迭代记录（R0–R23、R22c 正确性修复、OpenMP 计时修复及每次失败回退）见 [../优化日志.md](../优化日志.md)。R22/R23 连续两次未达双版本平均 T4  ≥1% 收益后，本轮已停止。
+老师尚未给出完整编译及运行命令。这里的命令是项目统一复现入口；默认四线程对应项目记录的四核评分要求，不绑核只是普通运行基线，并非老师禁止绑核。
 
-## 编译
+## 默认编译和运行
 
 ```bash
-make            # 历史 -O3 优化分析版：conv_pthread / conv_omp
-make official   # 2026-11-28 测评口径：系统默认 gcc + 纯 -O2 → conv_pthread_o2 / conv_omp_o2
+cd 作业/代码
+make
+./conv_pthread <input.bmp> <output.bmp>
+./conv_omp     <input.bmp> <output.bmp>
 ```
 
-- 历史 CFLAGS：`-O3 -march=native -funroll-loops -ffp-contract=fast -Wall -std=c11`，仅用于优化日志/报告的算法对比。
-- **成绩口径**：`make official` 使用 `gcc -O2`，不附加 `-O3/-march/-funroll/-ffp-contract/-std`；老师公告要求“最朴素的 O2 编译”。
+`make` 实际执行 `gcc -O2 -pthread conv_pthread.c -o conv_pthread` 和 `gcc -O2 -fopenmp conv_omp.c -o conv_omp`。Makefile 作为产物依赖，切换本轮 Makefile 后会重建此前的 O3 产物。`make official` 还会更新兼容旧命令的 `conv_pthread_o2`、`conv_omp_o2`。
 
-## 运行
+两版默认 4 线程；显式第三个参数可以选择 1、2、4 等线程数。OpenMP 仍支持 `显式参数 > OMP_NUM_THREADS > 默认 4`。测评脚本会清理继承的 OpenMP 绑核和线程限制设置，并确认程序打印的实际线程数。
 
-```bash
-./conv_pthread <input.bmp> <output.bmp> [threads] [--dump-full]
-./conv_omp     <input.bmp> <output.bmp> [threads] [--dump-full]
-```
+## 默认输出
 
-- `threads`：线程数，默认 4（Pthread 与 OpenMP 均为默认 4；OpenMP 仍可用 `OMP_NUM_THREADS` 覆盖）。
-- `--dump-full`：把卷积后完整像素矩阵写进 txt（timg 约 28M 像素，文件很大，慎用）。
-- 每次运行自动生成 `<output>.kernel.txt`（5×5 卷积核）和 `<output>.matrix.txt`
-  （像素矩阵：小图默认全量，timg 默认导出左上角 20×20 供验证）。
-- I/O 采用 mmap 零拷贝（读=按需缺页，写=直接写脏页），程序输出逐线程卷积时间
-  （缺页开销已含在内）与全程 Total time（2026-11-28 起为成绩计时口径）。
+每次运行生成 `<output.bmp>`、`<output.bmp>.kernel.txt`、`<output.bmp>.matrix.txt`。矩阵默认覆盖全图，以逻辑上从上到下的顺序保存；每个数据行对应一行图像，共有 `width × 3` 个整数，依次为 B、G、R。以 `#` 开始的两行为格式说明。
 
-## 实现要点
+`timg.bmp` 的矩阵包含 2304 行、28,311,552 个颜色通道值，文本约 100 MB。大图使用十进制查找表和分块写入；`TXT export` 记录卷积核和矩阵文本导出耗时。程序检查文本写入及关闭错误，导出失败时返回非零，不会把缺失或未完成的文本当作运行成功。
 
-1. **分离核两趟卷积**：5×5 高斯核 ≈ 1D 核 `k1` 的外积（对称特征分解最小二乘拟合，
-   残差 max 5.4e-9）。水平趟 `H(r) = Σ_kx k1[kx]·src[r][x+kx-2]`（5 行环形缓冲驻 L2，
-   源行只读一次），垂直趟 `out = Σ_ky k1[ky]·H(y+ky-2)`。每像素乘加 75→30。
-2. **单趟融合（R14/R15）**：垂直/水平趟均改为每 x 一次算完 5 tap
-   （5 load + 4 FMA + 1 store），免去中间平面 4 次"读-改-写"整平面往返；
-   边缘列走逐 tap 路径，窄图（w≤4）保留旧实现。由 RDTSC 分段插桩定位
-   （vpass 占纯计算 49%），两轮合计 T4 -20%。
-3. **连续 BGR 单布局（R19，取代 R9 通道平面化）**：三通道共用同一 1D 核 ⇒
-   每行视作 3w 字节数组，水平 tap 读 n±6/n±3/n（步长 3 字节，恒同通道）；
-   H 环形缓冲每槽 3w float 与源行/输出行同序，垂直趟直接舍入饱和写字节——
-   解交织、vbuf、pack 交织三个中间布局转换一次性删除，输出逐字节不变。
-4. **mmap 零拷贝 I/O**：输入 `PROT_READ` 映射直读；输出 `ftruncate + posix_fallocate
-   + MAP_SHARED` 映射直写（R21：fallocate 把 ext4 块分配挪到串行预备段，
-   从并行缺页路径卸下 ~7% T4；脏页由内核回写）。无显式 read/write。
-5. **BMP 免翻转**：核垂直方向对称 ⇒ 对"上下翻转的图"直接卷积 = 卷积结果的上下翻转，
-   故按文件原始行序（自下而上）就地处理，写回时同向高度即可。
-6. **边界零填充天然处理**：源行越界 → H 置零平面；x 方向逐 kx 取有效区间，无分支。
-7. **并行结构**：按行条带静态划分（Pthread：pthread_create/join 逐线程 clock_gettime
-   计时；OpenMP：parallel 区内手动等分条带，omp_get_wtime 逐线程计时）。
-   OpenMP 线程数优先级：**显式传参 > `OMP_NUM_THREADS` > 默认 4**，程序打印实际值。
+`--dump-full` 保留为兼容选项。`--dump-preview` 仅用于优化分析，输出最多 20×20 的局部矩阵，不属于默认完整输出。
 
-## 自测与验卷
+## O2 首次测评
 
 ```bash
-make check      # Pure_white.bmp 自测并过教师验卷器
-bash check_small.sh <新轮次>       # Pure_white/Pure_black × 两版，4 项教师检查
-bash check_round.sh <新轮次>       # timg × 两版，teacher + double 参考差异统计
-# 非均匀 BGR + 宽度 1–12 + 多个小高度 + BMP 行 padding；目录必须不存在
-python3 -I check_edges.py --pthread ./conv_pthread --omp ./conv_omp \
-    --work-dir ../优化日志/<新边界测试轮次>
-```
-
-R22c 修复的是宽度 5–7 的左右 BGR 边界窗口；官方大图输出保持逐字节不变。`check_edges_asan.c` 用于精确分配独立行缓冲区后执行 ASan 检查，编译方式和失败前后的原始证据见 `../优化日志/R22c/README.md`。均匀官方图通过并不能代替这项测试。
-
-正式验收（验卷器在 `环境验证/`，已按附件原样编译）：
-
-```bash
-../../环境验证/test ../../附件/.../测试程序/timg.bmp ../结果/timg_blur_pthread.bmp
-python3  ../../附件/.../测试程序/test_blur.py <原图> <你的模糊图>
-```
-
-最终验卷记录：`../结果/final_verify.txt`（R22c，6/6 PASS，MSE=0.00；小图回归双构建各 144 项通过）。
-
-## Benchmark（加速比 / 效率）
-
-> **2026-11-28 起成绩口径改用 `make official-run`**（plain `gcc -O2`、固定输入输出、4 线程、首次运行）。
-> 下面的 `run_bench.sh` 是 `-O3` + 多次取最优的**优化分析口径**，不能作为新标准成绩。
-
-```bash
-bash run_bench.sh [pthread|omp|both] [input.bmp]   # 默认 both + timg.bmp（历史 -O3 口径）
 make bench
-make official-run                                   # 新标准：plain -O2 + 首次运行 + 教师验卷
+# 等价入口
+make official-run
+bash run_bench.sh
+# 可指定版本、输入和一个尚不存在的结果目录
+bash run_official.sh both <input.bmp> <new-result-directory>
 ```
 
-- 1 / 2 / 4 核各跑 3 次取最优 `Total time`，输出 S(p)=T(1)/T(p)、E(p)=S(p)/p，
-  明细存 `../结果/bench_pthread.txt`、`bench_omp.txt`，汇总 `../结果/bench_summary.md`。
-- **taskset 选核注意**：本机 i9-13900K 的 CPU 0/1 是同一物理核的超线程兄弟，
-  2 核/4 核实验按物理核计：`taskset -c 0,2` 和 `taskset -c 0,2,4,6`。
+脚本强制以 GCC O2 重新编译，按相同输入与输出路径先执行两版默认四线程，再各执行一次一线程、二线程。没有预跑，也不从多次运行中挑最佳值。结果写入新目录，不覆盖旧轮次；其中保留编译记录、环境、逐线程时间、教师验卷原文、两版四线程完整结果，以及 `summary.txt`、`summary.json` 中的总时间和卷积段加速比、效率。
 
-优化迭代期间使用 `bench_round.sh <轮次> [pthread|omp|both] [RUNS]`（缺省 5 次取最优，
-best+median 留档 `bench_stats.txt`，原始输出逐轮留档到 `../优化日志/`）、
-`check_round.sh <轮次>`（验卷 + 与 double 参考图逐字节比对门禁），以及
-`bench_ab.sh <轮次> <基线二进制目录>`（基线/候选**交替**对照，抗共享机负载突发；
-基线二进制存档于 `../优化日志/_ab_base/`）。三个脚本均内置构建门禁（先 make，失败即止）。
+四线程组调用方式就是 `./conv_pthread input.bmp output.bmp` 或 `./conv_omp input.bmp output.bmp`，不加预览选项。教师验卷器从附件原始源码编译到新结果目录。脚本同时检查退出状态及两项 PASS；出现 FAIL 或缺少 PASS 时立即中止。
 
-## 最终数据（timg.bmp）
+## 绑核对照
 
-> **口径提醒**：以下 T4=8.6/8.7 ms 是历史 `-O3 -march=native`、多次取最优的**优化分析口径**，
-> **不是** 2026-11-28 新标准下的成绩。新标准（plain `gcc -O2`、4 线程、首次运行）实测：
-> 不绑核约 23–27 ms，绑 4 个物理 P 核约 19 ms。逐条对照与原始数据见
-> [`../测评标准对齐.md`](../测评标准对齐.md)。
+默认由系统调度。不绑核的大图按 64 行动态分配，绑核或处理小图时静态划分条带。可用 `CONV_CPUS` 在程序内按线程顺序绑定，设置和校验均在 `Total time` 内。本机 0、2、4、6 是四个不同的物理 P 核。线程数小于列表长度时使用列表前缀。程序拒绝重复、受限或不足的 CPU 列表。
 
-当前保留版 R22c（2026-11-23，`bench_round.sh R23final both 5` 最优 Total time；性能路径同 R21，另含正确性修复）：
+```bash
+CONV_CPUS=0,2,4,6 ./conv_pthread input.bmp output.bmp
+CONV_CPUS=0,2,4,6 ./conv_omp input.bmp output.bmp
+```
 
-| 版本 | T(1) ms | T(2) ms | T(4) ms | S(2) | S(4) | E(2) | E(4) |
-|------|---------|---------|---------|------|------|------|------|
-| Pthread | 23.481 | 14.507 | **8.661** | 1.6186 | 2.7111 | 0.8093 | 0.6778 |
-| OpenMP  | 24.279 | 14.145 | **8.725** | 1.7164 | 2.7827 | 0.8582 | 0.6957 |
+脚本记录 CPU 允许列表及 `CONV_CPUS`。原有的外层进程限定方式也可使用：
 
-R23 双输出垂直复用两版平均 T4 慢 0.83%，未保留；与 R22 一同触发“连续两次探索无正向收益停止”。第二轮 R21 的安静窗 T4 曾记录为约 8.4–8.9 / 9.2ms。
+```bash
+taskset -c 0,2,4,6 bash run_official.sh both <input.bmp> <new-result-directory>
+```
 
-这次官方 `run_bench.sh` 三次记录 T1/T2/T4 = Pthread 23.552/14.373/9.398ms、OpenMP 24.398/14.277/9.498ms。与上面的五次记录来自不同窗口，`bench_summary.md` 原样保存这次官方值，且每组完整样本均在，不据其宣称新一轮提速。
+外层 CPU 允许列表不会被脚本清除。这组结果应标为“物理 P 核限定”，与普通运行分别比较。本机 CPU 0/1 是同一物理核的两个逻辑线程，不能把 CPU 0–3 称为四个物理核。
 
-第一轮最终（R15 代码，2026-11-21 实测，官方 3 次取最优）：
+## 计时和数值范围
 
-| 版本 | T(1) ms | T(2) ms | T(4) ms | S(2) | S(4) | E(2) | E(4) |
-|------|---------|---------|---------|------|------|------|------|
-| Pthread | 29.1 | 16.8 | **9.8** | 1.73 | 2.98 | 0.86 | 0.74 |
-| OpenMP  | 28.8 | 16.7 | **10.4** | 1.72 | 2.77 | 0.86 | 0.69 |
+`Total time` 从 main 开头到输入访问、卷积、输出文件映射写入和 close 后，不含最终文本导出、打印、munmap，也不等待磁盘持久化；`Wall time (full)` 另外包含完整文本导出和 munmap。外部进程墙钟还包括程序启动及退出，因此不能把这三个指标混称为同一种总耗时。
 
-baseline（-O2 朴素实现）为 293.2/162.8/95.5 与 290.5/160.3/93.9 —— **4 核优化分析口径提速 ~11× / ~10×**（非 2026-11-28 新标准成绩）。
-（2026-11-21 早间 R10 版为 12.0/12.1 ms；R14/R15 单趟融合再 -18.6%/-14.0%；
-2026-11-22 第二轮 R19/R21 再约 -12%~-14%。）
+`Conv` 是最慢工作线程的卷积耗时，包含线程内分配及映射缺页，不包含线程创建与回收的全部开销。汇总同时计算 `S_total/E_total` 和 `S_conv/E_conv`。
 
-## 文件
+x86-64 运行时检查 AVX2 与操作系统 YMM 支持。满足条件时以手写 SIMD 对 32 行分块，将垂直对称系数的三个乘积分送到五个输出位置，并保持每个像素原来的 float32 加法次序。较窄的图或不支持 AVX2 的 CPU 沿用原有的标量五行缓冲。两版共用同一卷积和文本编码实现。近似分离与原二维核有极小数值差异，但已通过教师大于 99% 的相似度阈值；`MSE=0.00` 和 `100.00%` 是两位小数显示，不表示逐像素完全相同。没有将“必须逐系数计算原核”视为已确认的新增要求。
 
-| 文件 | 说明 |
-|------|------|
-| `conv_pthread.c` | Pthread 版（条带划分 + 分离核连续 BGR 卷积 + mmap I/O，逐线程计时） |
-| `conv_omp.c`     | OpenMP 版（同构实现，omp_get_wtime 计时） |
-| `run_bench.sh`   | 正式 1/2/4 核 benchmark + 加速比/效率汇总 |
-| `bench_round.sh` | 优化迭代用统一基准（缺省 5 次取最优 + best/median 留档，逐轮留档） |
-| `bench_ab.sh`    | 基线/候选交替对照（抗共享机负载突发，best+median） |
-| `check_round.sh` | 大图正确性门禁（教师验卷器 + 参考图逐字节比对） |
-| `check_small.sh` | 两张官方小图 × 两版的教师验卷；要求新轮次目录 |
-| `check_edges.py` | 非均匀窄图、BGR 边界与行 padding 的直接卷积回归 |
-| `check_edges_asan.c` | 独立单行堆分配 + ASan 的越界定位探针 |
-| `run_official.sh` | 2026-11-28 测评口径自检（plain -O2、固定 I/O、4 线程、首次运行、验卷） |
-| `Makefile`       | `make` / `make official` / `make official-run` / `make check` / `make bench` / `make clean` |
+## 验证与进一步优化
+
+```bash
+make check
+python3 -I check_edges.py --pthread ./conv_pthread --omp ./conv_omp --work-dir <new-edge-directory>
+```
+
+`make check` 也检查教师验卷文本，避免相似度失败但验卷器退出码为 0 时出现假通过。现有 `check_round.sh`、`check_small.sh` 仍可使用。`bench_round.sh`、`bench_ab.sh` 是多次采样的优化分析工具，数据不得替代 O2 首次测评成绩；当前默认构建已改为 O2，不可把新旧构建结果直接归因于算法收益。
+
+`make optimized` 显式生成 `conv_pthread_opt`、`conv_omp_opt`，采用历史 GCC 11、O3/native 等选项，仅用于性能分析，不覆盖默认 O2 程序。历史优化过程、回退与原始数据保留在 `../优化日志.md` 和 `../优化日志/`。

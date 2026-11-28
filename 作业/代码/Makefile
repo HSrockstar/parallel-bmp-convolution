@@ -1,69 +1,56 @@
-# BMP 图像卷积作业 —— Pthread / OpenMP baseline
-#
-# make            编译两个版本
-# make run-small  用 Pure_white.bmp 自测（Pthread 4 线程）
-# make check      教师验卷器对比（Pure_white）
-# make bench      1/2/4 核 benchmark（timg.bmp，结果存 ../结果/）
-# make official   2026-11-28 测评口径：plain -O2 构建
-# make official-run 固定输入输出 + 4 线程 + 首次运行自检
-# make clean
-
-# 基准整备：钉住 gcc-11（=11.4.0，优化日志协议记录的编译器；系统默认 gcc 已漂移到 10.5，
-# 换编译器会破坏 R0-R16 数据可比性，故显式指定）
-CC      := gcc-11
-# R1: -O2 → -O3 -march=native -funroll-loops（开启自动向量化/FMA/激进调度；
-#     -march=native 在编译机上自适应本机指令集，重编译无移植问题）
-# R7: -ffp-contract=fast —— ISO C 模式(-std=c11)下 GCC 默认关闭 FMA 收缩，
-#     显式打开后 a*b+c 编译为 vfmadd（融合乘加），乘加型卷积循环指令数减半
-CFLAGS  := -O3 -march=native -funroll-loops -ffp-contract=fast -Wall -std=c11
-LD_PTHREAD := -lpthread
-
+# 默认入口使用老师记录的朴素 O2；优化分析构建必须显式选择。
+CC := gcc
+CFLAGS := -O2
 TESTDIR := ../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序
-RESULT  := ../结果
+RESULT := ../结果
 CHECKER := ../../环境验证/test
 
+.PHONY: all official official-run bench check run-small optimized clean
 all: conv_pthread conv_omp
 
-conv_pthread: conv_pthread.c bmp_safe.h
-	$(CC) $(CFLAGS) $< -o $@ $(LD_PTHREAD)
+conv_pthread: conv_pthread.c bmp_safe.h conv_core.h conv_fused.h matrix_text.h conv_affinity.h Makefile
+	$(CC) $(CFLAGS) -pthread $< -o $@
 
-conv_omp: conv_omp.c bmp_safe.h
+conv_omp: conv_omp.c bmp_safe.h conv_core.h conv_fused.h matrix_text.h conv_affinity.h Makefile
 	$(CC) $(CFLAGS) -fopenmp $< -o $@
 
-# 自测：全白图 + 4 线程
-run-small: all
-	mkdir -p $(RESULT)
-	./conv_pthread $(TESTDIR)/Pure_white.bmp $(RESULT)/Pure_white_blur_pthread.bmp 4
-	./conv_omp     $(TESTDIR)/Pure_white.bmp $(RESULT)/Pure_white_blur_omp.bmp     4
+# 保留旧的 _o2 文件名，避免历史命令误用过期产物。
+official: all conv_pthread_o2 conv_omp_o2
 
-# 教师验卷器（OpenCV）：原图 vs 我们的模糊图
-check: run-small
-	$(CHECKER) $(TESTDIR)/Pure_white.bmp $(RESULT)/Pure_white_blur_pthread.bmp
-	$(CHECKER) $(TESTDIR)/Pure_white.bmp $(RESULT)/Pure_white_blur_omp.bmp
+conv_pthread_o2: conv_pthread.c bmp_safe.h conv_core.h conv_fused.h matrix_text.h conv_affinity.h Makefile
+	gcc -O2 -pthread $< -o $@
 
-# 正式：timg.bmp + 1/2/4 核加速比（详细用 bash run_bench.sh）
-bench: all
-	bash run_bench.sh
-
-# ===== 2026-11-28 测评口径：最朴素 -O2 =====
-# 老师公告：统一使用最朴素的 O2 编译、统一编译运行指令、首次测评计时。
-# 该目标不附加 -O3/-march=native/-funroll-loops/-ffp-contract/-std，
-# 用系统默认 gcc（本机 10.5.0）编译，供成绩口径自检；历史 -O3 目标保留用于优化分析。
-CC_OFFICIAL      := gcc
-CFLAGS_OFFICIAL  := -O2
-OFFICIAL_PTHREAD := conv_pthread_o2
-OFFICIAL_OMP     := conv_omp_o2
-
-official: $(OFFICIAL_PTHREAD) $(OFFICIAL_OMP)
-
-$(OFFICIAL_PTHREAD): conv_pthread.c bmp_safe.h
-	$(CC_OFFICIAL) $(CFLAGS_OFFICIAL) -pthread $< -o $@
-
-$(OFFICIAL_OMP): conv_omp.c bmp_safe.h
-	$(CC_OFFICIAL) $(CFLAGS_OFFICIAL) -fopenmp $< -o $@
+conv_omp_o2: conv_omp.c bmp_safe.h conv_core.h conv_fused.h matrix_text.h conv_affinity.h Makefile
+	gcc -O2 -fopenmp $< -o $@
 
 official-run: official
 	bash run_official.sh
 
+bench: official-run
+
+run-small: all
+	mkdir -p $(RESULT)
+	./conv_pthread $(TESTDIR)/Pure_white.bmp $(RESULT)/Pure_white_blur_pthread.bmp 4
+	./conv_omp $(TESTDIR)/Pure_white.bmp $(RESULT)/Pure_white_blur_omp.bmp 4
+
+check: run-small
+	$(CHECKER) $(TESTDIR)/Pure_white.bmp $(RESULT)/Pure_white_blur_pthread.bmp > $(RESULT)/check_pthread.txt
+	cat $(RESULT)/check_pthread.txt
+	! grep -q '\[FAIL\]' $(RESULT)/check_pthread.txt
+	test "$$(grep -c '^\[PASS\]' $(RESULT)/check_pthread.txt)" -eq 2
+	$(CHECKER) $(TESTDIR)/Pure_white.bmp $(RESULT)/Pure_white_blur_omp.bmp > $(RESULT)/check_omp.txt
+	cat $(RESULT)/check_omp.txt
+	! grep -q '\[FAIL\]' $(RESULT)/check_omp.txt
+	test "$$(grep -c '^\[PASS\]' $(RESULT)/check_omp.txt)" -eq 2
+
+# 仅供历史优化分析，不作为 O2 首次测评成绩。
+optimized: conv_pthread_opt conv_omp_opt
+
+conv_pthread_opt: conv_pthread.c bmp_safe.h conv_core.h conv_fused.h matrix_text.h conv_affinity.h Makefile
+	gcc-11 -O3 -march=native -funroll-loops -ffp-contract=fast -Wall -std=c11 -pthread $< -o $@
+
+conv_omp_opt: conv_omp.c bmp_safe.h conv_core.h conv_fused.h matrix_text.h conv_affinity.h Makefile
+	gcc-11 -O3 -march=native -funroll-loops -ffp-contract=fast -Wall -std=c11 -fopenmp $< -o $@
+
 clean:
-	rm -f conv_pthread conv_omp conv_pthread_o2 conv_omp_o2
+	rm -f conv_pthread conv_omp conv_pthread_o2 conv_omp_o2 conv_pthread_opt conv_omp_opt

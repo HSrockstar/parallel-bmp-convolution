@@ -1,0 +1,15 @@
+kernel txt      : /home/hyc2452273/图片卷积/作业/结果/O2首测_20261128_125154_3598875/official_output.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/结果/O2首测_20261128_125154_3598875/official_output.bmp.matrix.txt (full matrix, 4096 x 2304)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/结果/O2首测_20261128_125154_3598875/official_output.bmp
+Threads         : 1
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0  rows  2304             conv =   40.038 ms
+TXT export      :     27.322 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=1)    40.038 ms   (critical path = max thread)
+Conv   : sum/thread                40.038 ms   (sum of per-thread times)
+Total time      :     40.520 ms
+Wall time (full) :     69.239 ms   (Total + 文本导出 + munmap)

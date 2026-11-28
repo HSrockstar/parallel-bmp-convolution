@@ -10,7 +10,7 @@
 #   核数   1/2/4 物理P核: taskset -c 0 / 0,2 / 0,2,4,6
 #          (i9-13900K: CPU0-15 = 8个P核的两两HT, CPU16-31 = E核, 按物理核计数)
 #   次数   每组 RUNS 次取 "Total time" 最优（共享机器有背景负载，取 min 抗噪声）
-#   指标   程序自打印 Total time（读图+卷积+写图，即成绩统计口径）
+#   指标   程序自打印 Total time（读图+卷积+写图，不含文本导出的分析口径；多次最优不能作为首次测评成绩）
 #
 # 输出:
 #   ../优化日志/<round>/bench_<版本>.txt   每次运行完整输出（含分段计时与逐线程时间）
@@ -35,6 +35,8 @@ SUMMARY="$LOGROOT/summary.tsv"
 make -s -C "$PROG_DIR" all || { echo "ERROR: 构建失败，中止基准" >&2; exit 1; }
 
 {
+    echo "build commands (current default):"
+    make -Bn -C "$PROG_DIR" all
     echo "date        : $(date '+%F %T')"
     echo "input       : $INPUT"
     echo "runs/config : $RUNS (best kept)"

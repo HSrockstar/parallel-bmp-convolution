@@ -1,0 +1,68 @@
+[
+  {
+    "version": "pthread",
+    "threads": 1,
+    "total_ms": 26.334,
+    "conv_ms": 25.608,
+    "full_ms": 58.012,
+    "speedup_total": 1.0,
+    "efficiency_total": 1.0,
+    "speedup_conv": 1.0,
+    "efficiency_conv": 1.0
+  },
+  {
+    "version": "pthread",
+    "threads": 2,
+    "total_ms": 19.001,
+    "conv_ms": 18.321,
+    "full_ms": 50.439,
+    "speedup_total": 1.385927056470712,
+    "efficiency_total": 0.692963528235356,
+    "speedup_conv": 1.397740298018667,
+    "efficiency_conv": 0.6988701490093335
+  },
+  {
+    "version": "pthread",
+    "threads": 4,
+    "total_ms": 12.041,
+    "conv_ms": 11.432,
+    "full_ms": 49.201,
+    "speedup_total": 2.1870276555103394,
+    "efficiency_total": 0.5467569138775848,
+    "speedup_conv": 2.240027991602519,
+    "efficiency_conv": 0.5600069979006298
+  },
+  {
+    "version": "omp",
+    "threads": 1,
+    "total_ms": 40.52,
+    "conv_ms": 40.038,
+    "full_ms": 69.239,
+    "speedup_total": 1.0,
+    "efficiency_total": 1.0,
+    "speedup_conv": 1.0,
+    "efficiency_conv": 1.0
+  },
+  {
+    "version": "omp",
+    "threads": 2,
+    "total_ms": 23.018,
+    "conv_ms": 13.842,
+    "full_ms": 53.651,
+    "speedup_total": 1.7603614562516292,
+    "efficiency_total": 0.8801807281258146,
+    "speedup_conv": 2.8925010836584306,
+    "efficiency_conv": 1.4462505418292153
+  },
+  {
+    "version": "omp",
+    "threads": 4,
+    "total_ms": 12.271,
+    "conv_ms": 11.546,
+    "full_ms": 47.155,
+    "speedup_total": 3.302094368837096,
+    "efficiency_total": 0.825523592209274,
+    "speedup_conv": 3.467694439632773,
+    "efficiency_conv": 0.8669236099081933
+  }
+]

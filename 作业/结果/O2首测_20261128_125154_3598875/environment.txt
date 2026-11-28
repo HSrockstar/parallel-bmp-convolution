@@ -1,0 +1,12 @@
+2026-11-28T12:51:54+08:00
+gcc (Ubuntu 10.5.0-1ubuntu1~22.04.3) 10.5.0
+Linux 6.8.0-138-generic
+Model name:                              13th Gen Intel(R) Core(TM) i9-13900K
+input=/home/hyc2452273/图片卷积/附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp
+output=/home/hyc2452273/图片卷积/作业/结果/O2首测_20261128_125154_3598875/official_output.bmp
+loadavg=1.47 1.67 2.95 2/6580 3598889
+allowed_cpus=0-31
+CONV_CPUS=<unset>
+OMP_NUM_THREADS=4 OMP_DYNAMIC=FALSE; no additional affinity in this script
+  RES PAGES SIZE FILE
+  27M  6913  27M /home/hyc2452273/图片卷积/附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp
