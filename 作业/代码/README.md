@@ -9,10 +9,12 @@ Pthread / OpenMP 两版并行高斯卷积。5×5 核（σ=1.5, r=2）、stride=1
 ## 编译
 
 ```bash
-make            # 生成 conv_pthread 和 conv_omp
+make            # 历史 -O3 优化分析版：conv_pthread / conv_omp
+make official   # 2026-11-28 测评口径：系统默认 gcc + 纯 -O2 → conv_pthread_o2 / conv_omp_o2
 ```
 
-CFLAGS：`-O3 -march=native -funroll-loops -ffp-contract=fast -Wall -std=c11`
+- 历史 CFLAGS：`-O3 -march=native -funroll-loops -ffp-contract=fast -Wall -std=c11`，仅用于优化日志/报告的算法对比。
+- **成绩口径**：`make official` 使用 `gcc -O2`，不附加 `-O3/-march/-funroll/-ffp-contract/-std`；老师公告要求“最朴素的 O2 编译”。
 
 ## 运行
 
@@ -21,12 +23,12 @@ CFLAGS：`-O3 -march=native -funroll-loops -ffp-contract=fast -Wall -std=c11`
 ./conv_omp     <input.bmp> <output.bmp> [threads] [--dump-full]
 ```
 
-- `threads`：线程数，默认 4（OpenMP 版也可用 `OMP_NUM_THREADS`）。
+- `threads`：线程数，默认 4（Pthread 与 OpenMP 均为默认 4；OpenMP 仍可用 `OMP_NUM_THREADS` 覆盖）。
 - `--dump-full`：把卷积后完整像素矩阵写进 txt（timg 约 28M 像素，文件很大，慎用）。
 - 每次运行自动生成 `<output>.kernel.txt`（5×5 卷积核）和 `<output>.matrix.txt`
   （像素矩阵：小图默认全量，timg 默认导出左上角 20×20 供验证）。
 - I/O 采用 mmap 零拷贝（读=按需缺页，写=直接写脏页），程序输出逐线程卷积时间
-  （缺页开销已含在内）与全程 Total time（成绩口径）。
+  （缺页开销已含在内）与全程 Total time（2026-11-28 起为成绩计时口径）。
 
 ## 实现要点
 
@@ -49,7 +51,7 @@ CFLAGS：`-O3 -march=native -funroll-loops -ffp-contract=fast -Wall -std=c11`
 6. **边界零填充天然处理**：源行越界 → H 置零平面；x 方向逐 kx 取有效区间，无分支。
 7. **并行结构**：按行条带静态划分（Pthread：pthread_create/join 逐线程 clock_gettime
    计时；OpenMP：parallel 区内手动等分条带，omp_get_wtime 逐线程计时）。
-   OpenMP 线程数优先级：**显式传参 > `OMP_NUM_THREADS` > OpenMP 默认**，程序打印实际值。
+   OpenMP 线程数优先级：**显式传参 > `OMP_NUM_THREADS` > 默认 4**，程序打印实际值。
 
 ## 自测与验卷
 
@@ -75,9 +77,13 @@ python3  ../../附件/.../测试程序/test_blur.py <原图> <你的模糊图>
 
 ## Benchmark（加速比 / 效率）
 
+> **2026-11-28 起成绩口径改用 `make official-run`**（plain `gcc -O2`、固定输入输出、4 线程、首次运行）。
+> 下面的 `run_bench.sh` 是 `-O3` + 多次取最优的**优化分析口径**，不能作为新标准成绩。
+
 ```bash
-bash run_bench.sh [pthread|omp|both] [input.bmp]   # 默认 both + timg.bmp
+bash run_bench.sh [pthread|omp|both] [input.bmp]   # 默认 both + timg.bmp（历史 -O3 口径）
 make bench
+make official-run                                   # 新标准：plain -O2 + 首次运行 + 教师验卷
 ```
 
 - 1 / 2 / 4 核各跑 3 次取最优 `Total time`，输出 S(p)=T(1)/T(p)、E(p)=S(p)/p，
@@ -92,6 +98,11 @@ best+median 留档 `bench_stats.txt`，原始输出逐轮留档到 `../优化日
 基线二进制存档于 `../优化日志/_ab_base/`）。三个脚本均内置构建门禁（先 make，失败即止）。
 
 ## 最终数据（timg.bmp）
+
+> **口径提醒**：以下 T4=8.6/8.7 ms 是历史 `-O3 -march=native`、多次取最优的**优化分析口径**，
+> **不是** 2026-11-28 新标准下的成绩。新标准（plain `gcc -O2`、4 线程、首次运行）实测：
+> 不绑核约 23–27 ms，绑 4 个物理 P 核约 19 ms。逐条对照与原始数据见
+> [`../测评标准对齐.md`](../测评标准对齐.md)。
 
 当前保留版 R22c（2026-11-23，`bench_round.sh R23final both 5` 最优 Total time；性能路径同 R21，另含正确性修复）：
 
@@ -111,7 +122,7 @@ R23 双输出垂直复用两版平均 T4 慢 0.83%，未保留；与 R22 一同�
 | Pthread | 29.1 | 16.8 | **9.8** | 1.73 | 2.98 | 0.86 | 0.74 |
 | OpenMP  | 28.8 | 16.7 | **10.4** | 1.72 | 2.77 | 0.86 | 0.69 |
 
-baseline（-O2 朴素实现）为 293.2/162.8/95.5 与 290.5/160.3/93.9 —— **4 核成绩口径提速 ~11× / ~10×**。
+baseline（-O2 朴素实现）为 293.2/162.8/95.5 与 290.5/160.3/93.9 —— **4 核优化分析口径提速 ~11× / ~10×**（非 2026-11-28 新标准成绩）。
 （2026-11-21 早间 R10 版为 12.0/12.1 ms；R14/R15 单趟融合再 -18.6%/-14.0%；
 2026-11-22 第二轮 R19/R21 再约 -12%~-14%。）
 
@@ -128,4 +139,5 @@ baseline（-O2 朴素实现）为 293.2/162.8/95.5 与 290.5/160.3/93.9 —— *
 | `check_small.sh` | 两张官方小图 × 两版的教师验卷；要求新轮次目录 |
 | `check_edges.py` | 非均匀窄图、BGR 边界与行 padding 的直接卷积回归 |
 | `check_edges_asan.c` | 独立单行堆分配 + ASan 的越界定位探针 |
-| `Makefile`       | `make` / `make check` / `make bench` / `make clean`（CC 钉住 gcc-11） |
+| `run_official.sh` | 2026-11-28 测评口径自检（plain -O2、固定 I/O、4 线程、首次运行、验卷） |
+| `Makefile`       | `make` / `make official` / `make official-run` / `make check` / `make bench` / `make clean` |

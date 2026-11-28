@@ -1,6 +1,8 @@
 # 编译产物
 作业/代码/conv_pthread
 作业/代码/conv_omp
+作业/代码/conv_pthread_o2
+作业/代码/conv_omp_o2
 作业/代码/*.o
 环境验证/test
 
@@ -9,6 +11,12 @@
 作业/结果/bench_blur.bmp.kernel.txt
 作业/结果/bench_blur.bmp.matrix.txt
 *.bmp.kernel.txt.tmp
+
+# 2026-11-28 测评口径自检的大图产物（文本日志保留）
+作业/结果/测评口径/*.bmp
+作业/结果/测评口径/*.bmp.kernel.txt
+作业/结果/测评口径/*.bmp.matrix.txt
+作业/结果/测评口径/*.checker
 
 # 回归测试/诊断生成的 Python 字节码
 __pycache__/

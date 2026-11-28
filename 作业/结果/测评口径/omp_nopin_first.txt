@@ -1,0 +1,20 @@
+===== omp_nopin =====
+command: /home/hyc2452273/图片卷积/作业/代码/conv_omp_o2 /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp /home/hyc2452273/图片卷积/作业/代码/../结果/测评口径/official_output.bmp
+threads: 4 (默认)
+kernel txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/测评口径/official_output.bmp.kernel.txt
+matrix txt      : /home/hyc2452273/图片卷积/作业/代码/../结果/测评口径/official_output.bmp.matrix.txt (top-left 20x20 block)
+================ OpenMP BMP Gaussian Convolution ==================
+Input           : /home/hyc2452273/图片卷积/作业/代码/../../附件/采用Pthread对BMP图片进行卷积作业附件/测试程序/测试程序/timg.bmp (4096 x 2304, 24bpp, stride=12288)
+Output BMP      : /home/hyc2452273/图片卷积/作业/代码/../结果/测评口径/official_output.bmp
+Threads         : 4 (OMP_NUM_THREADS / 默认 4)
+---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----
+  thread 0                     conv =   18.867 ms
+  thread 1                     conv =   26.140 ms
+  thread 2                     conv =   19.370 ms
+  thread 3                     conv =   21.769 ms
+---- timing ----
+I/O    : mmap 零拷贝（读=按需缺页+页缓存命中，写=直接写脏页，无显式读写）
+Conv   : (parallel region, p=4)    26.140 ms   (critical path = max thread)
+Conv   : sum/thread                86.146 ms   (sum of per-thread times)
+Total time      :     26.773 ms
+Wall time (full) :     28.114 ms   (Total + 文本导出 + munmap)

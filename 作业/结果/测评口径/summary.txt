@@ -1,0 +1,4 @@
+pthread_nopin    Total time = 25.690 ms
+omp_nopin        Total time = 26.773 ms
+pthread_ppin     Total time = 19.282 ms
+omp_ppin         Total time = 19.189 ms

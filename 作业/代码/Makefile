@@ -4,6 +4,8 @@
 # make run-small  用 Pure_white.bmp 自测（Pthread 4 线程）
 # make check      教师验卷器对比（Pure_white）
 # make bench      1/2/4 核 benchmark（timg.bmp，结果存 ../结果/）
+# make official   2026-11-28 测评口径：plain -O2 构建
+# make official-run 固定输入输出 + 4 线程 + 首次运行自检
 # make clean
 
 # 基准整备：钉住 gcc-11（=11.4.0，优化日志协议记录的编译器；系统默认 gcc 已漂移到 10.5，
@@ -43,5 +45,25 @@ check: run-small
 bench: all
 	bash run_bench.sh
 
+# ===== 2026-11-28 测评口径：最朴素 -O2 =====
+# 老师公告：统一使用最朴素的 O2 编译、统一编译运行指令、首次测评计时。
+# 该目标不附加 -O3/-march=native/-funroll-loops/-ffp-contract/-std，
+# 用系统默认 gcc（本机 10.5.0）编译，供成绩口径自检；历史 -O3 目标保留用于优化分析。
+CC_OFFICIAL      := gcc
+CFLAGS_OFFICIAL  := -O2
+OFFICIAL_PTHREAD := conv_pthread_o2
+OFFICIAL_OMP     := conv_omp_o2
+
+official: $(OFFICIAL_PTHREAD) $(OFFICIAL_OMP)
+
+$(OFFICIAL_PTHREAD): conv_pthread.c bmp_safe.h
+	$(CC_OFFICIAL) $(CFLAGS_OFFICIAL) -pthread $< -o $@
+
+$(OFFICIAL_OMP): conv_omp.c bmp_safe.h
+	$(CC_OFFICIAL) $(CFLAGS_OFFICIAL) -fopenmp $< -o $@
+
+official-run: official
+	bash run_official.sh
+
 clean:
-	rm -f conv_pthread conv_omp
+	rm -f conv_pthread conv_omp conv_pthread_o2 conv_omp_o2

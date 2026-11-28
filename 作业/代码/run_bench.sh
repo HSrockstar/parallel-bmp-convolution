@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # run_bench.sh —— 1/2/4 核 benchmark，输出加速比 S(p)=T(1)/T(p) 与效率 E(p)=S(p)/p
 #
+# ⚠️ 2026-11-28 起本脚本仅用于历史 -O3 优化分析（多次取最优），**不是成绩口径**。
+#    成绩口径请用 run_official.sh：plain gcc -O2 + 固定 I/O + 4 线程 + 首次运行。
+#
 # 用法: bash run_bench.sh [pthread|omp|both] [input.bmp]
 # 默认 both + timg.bmp；每组跑 RUNS 次取最优（多核机器上有抖动，取 min 更稳）
 #

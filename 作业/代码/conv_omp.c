@@ -6,8 +6,8 @@
  *
  * 用法: ./conv_omp <input.bmp> <output.bmp> [threads] [--dump-full]
  *   threads      线程数；未指定时尊重 OMP_NUM_THREADS 环境变量，
- *                环境变量也未设则用 OpenMP 默认（通常 = 可用核数）。
- *                显式传参 > OMP_NUM_THREADS > 系统默认。
+ *                环境变量也未设则默认 4（作业四核口径）。
+ *                显式传参 > OMP_NUM_THREADS > 默认 4。
  *   --dump-full  将卷积后的完整像素矩阵写入 txt（大图会很大，默认只导出局部供验证）
  *
  * 输出文件：
@@ -38,7 +38,7 @@
  *
  * 计时：omp_get_wtime 计全程墙钟；逐线程打印读条带/卷积（并行段）/写条带
  *       分段耗时，并行段关键路径 = max(各线程卷积时间)。
- *       线程数：显式传参 > OMP_NUM_THREADS > OpenMP 默认（打印实际值）。
+ *       线程数：显式传参 > OMP_NUM_THREADS > 默认 4（打印实际值）。
  */
 #define _POSIX_C_SOURCE 200809L   /* mmap/pread/pwrite */
 #define _DEFAULT_SOURCE            /* madvise / MADV_SEQUENTIAL */
@@ -132,7 +132,7 @@ static int conv_band(const uint8_t *src, int base, int nrows,
                       uint8_t *dst, int w, int stride, int y0, int y1)
 {
     const size_t sn = (size_t)w * 3;                  /* 每行有效字节数（H 槽步长） */
-    float *hb = malloc(5 * sn * sizeof(float));       /* 5 槽 × 3w float（~245KB, L2） */
+    float *hb = (float *)malloc(5 * sn * sizeof(float));       /* 5 槽 × 3w float（~245KB, L2） */
     if (!hb) return -1;
 
     for (int i = 0; i < 5; i++) {
@@ -215,6 +215,9 @@ static void dump_matrix(const char *base, const uint8_t *data,
 /* ---------------- main ---------------- */
 int main(int argc, char **argv)
 {
+    /* 2026-11-28 测评口径：程序首（第一次输入前）开始计时 */
+    double t_all0 = omp_get_wtime();
+
     if (argc < 3) {
         fprintf(stderr,
                 "Usage: %s <input.bmp> <output.bmp> [threads] [--dump-full]\n",
@@ -233,8 +236,7 @@ int main(int argc, char **argv)
         else if (bmp_positive_int(argv[i], &nthreads)) { fprintf(stderr, "invalid threads/option\n"); return 1; }
     }
     if (nthreads > 0) omp_set_num_threads(nthreads);
-
-    double t_all0 = omp_get_wtime();
+    else if (!getenv("OMP_NUM_THREADS")) omp_set_num_threads(4);  /* 作业默认四核；显式环境变量仍优先 */
 
     /* 1. 解析 BMP 头 + mmap 输入文件（像素按需缺页，免整图读拷贝） */
     int in_fd = open(in_path, O_RDONLY);
@@ -249,7 +251,7 @@ int main(int argc, char **argv)
     const int w = bmp.w, h = bmp.h, stride = bmp.stride;
     off_t in_size;
     if (bmp_file_size(in_fd, &bmp, &in_size)) { fprintf(stderr, "truncated/invalid BMP\n"); close(in_fd); return 1; }
-    uint8_t *in_map = mmap(NULL, (size_t)in_size, PROT_READ, MAP_SHARED, in_fd, 0);
+    uint8_t *in_map = (uint8_t *)mmap(NULL, (size_t)in_size, PROT_READ, MAP_SHARED, in_fd, 0);
     if (in_map == MAP_FAILED) { fprintf(stderr, "mmap input failed\n"); return 1; }
 
     /* 2. 创建输出文件：ftruncate 定长 + 写头 + MAP_SHARED 映射，
@@ -266,7 +268,7 @@ int main(int argc, char **argv)
         fprintf(stderr, "fallocate failed\n"); return 1;
     }
     if (pwrite(out_fd, ohdr, 54, 0) != 54) { fprintf(stderr, "write header failed\n"); return 1; }
-    uint8_t *out_map = mmap(NULL, out_mapsize, PROT_READ | PROT_WRITE, MAP_SHARED, out_fd, 0);
+    uint8_t *out_map = (uint8_t *)mmap(NULL, out_mapsize, PROT_READ | PROT_WRITE, MAP_SHARED, out_fd, 0);
     if (out_map == MAP_FAILED) { fprintf(stderr, "mmap output failed\n"); return 1; }
     uint8_t *out = out_map + 54;
     {   /* 头部与像素区之间的间隙及行尾填充字节清零（本实验图片均为 0，通用性保险） */
@@ -279,7 +281,7 @@ int main(int argc, char **argv)
     /* 3. 并行：各线程在自己的条带上卷积（源/目的均为文件映射） */
     if (omp_get_max_threads() > h) omp_set_num_threads(h);
     int maxt = omp_get_max_threads();
-    double *conv_ms = calloc((size_t)maxt, sizeof(double));
+    double *conv_ms = (double *)calloc((size_t)maxt, sizeof(double));
     if (!conv_ms) { fprintf(stderr,"thread allocation failed\n"); return 1; }
     int error = 0;
     int np_actual = 0;                        /* 并行区实际线程数（用于打印） */
@@ -318,7 +320,7 @@ int main(int argc, char **argv)
     printf("Input           : %s (%d x %d, 24bpp, stride=%d)\n", in_path, w, h, stride);
     printf("Output BMP      : %s\n", out_path);
     printf("Threads         : %d%s\n", np_actual,
-           nthreads > 0 ? "" : " (OMP_NUM_THREADS / default)");
+           nthreads > 0 ? "" : " (OMP_NUM_THREADS / 默认 4)");
     printf("---- per-thread conv time (R8: I/O 零拷贝 mmap，缺页计入 conv) ----\n");
     double max_conv = 0, sum_conv = 0;
     for (int i = 0; i < np_actual; i++) {

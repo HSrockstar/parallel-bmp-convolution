@@ -165,7 +165,7 @@ static int conv_band(const uint8_t *src, int base, int nrows,
                       uint8_t *dst, int w, int stride, int y0, int y1)
 {
     const size_t sn = (size_t)w * 3;                  /* 每行有效字节数（H 槽步长） */
-    float *hb = malloc(5 * sn * sizeof(float));       /* 5 槽 × 3w float（~245KB, L2） */
+    float *hb = (float *)malloc(5 * sn * sizeof(float));       /* 5 槽 × 3w float（~245KB, L2） */
     if (!hb) return -1;
 
     /* 初始化窗口行 [y0-2, y0+3) */
@@ -268,6 +268,9 @@ static void dump_matrix(const char *base, const uint8_t *data,
 /* ---------------- main ---------------- */
 int main(int argc, char **argv)
 {
+    /* 2026-11-28 测评口径：程序首（第一次输入前）开始计时 */
+    double t_all0 = now_sec();
+
     if (argc < 3) {
         fprintf(stderr,
                 "Usage: %s <input.bmp> <output.bmp> [threads] [--dump-full]\n",
@@ -284,8 +287,6 @@ int main(int argc, char **argv)
     }
     if (nthreads < 1) nthreads = 1;
 
-    double t_all0 = now_sec();
-
     /* 1. 解析 BMP 头 + mmap 输入文件（像素按需缺页，免整图读拷贝） */
     g_in_fd = open(in_path, O_RDONLY);
     if (g_in_fd < 0) { fprintf(stderr, "cannot open %s\n", in_path); return 1; }
@@ -298,7 +299,7 @@ int main(int argc, char **argv)
     const int w = g_bmp.w, h = g_bmp.h, stride = g_bmp.stride;
     off_t in_size;
     if (bmp_file_size(g_in_fd, &g_bmp, &in_size)) { fprintf(stderr, "truncated/invalid BMP\n"); close(g_in_fd); return 1; }
-    g_in_map = mmap(NULL, (size_t)in_size, PROT_READ, MAP_SHARED, g_in_fd, 0);
+    g_in_map = (uint8_t *)mmap(NULL, (size_t)in_size, PROT_READ, MAP_SHARED, g_in_fd, 0);
     if (g_in_map == MAP_FAILED) { fprintf(stderr, "mmap input failed\n"); return 1; }
 
     /* 2. 创建输出文件：ftruncate 定长 + 写头 + MAP_SHARED 映射，
@@ -315,7 +316,7 @@ int main(int argc, char **argv)
         fprintf(stderr, "fallocate failed\n"); return 1;
     }
     if (pwrite(g_out_fd, ohdr, 54, 0) != 54) { fprintf(stderr, "write header failed\n"); return 1; }
-    g_out_map = mmap(NULL, g_out_mapsize, PROT_READ | PROT_WRITE, MAP_SHARED, g_out_fd, 0);
+    g_out_map = (uint8_t *)mmap(NULL, g_out_mapsize, PROT_READ | PROT_WRITE, MAP_SHARED, g_out_fd, 0);
     if (g_out_map == MAP_FAILED) { fprintf(stderr, "mmap output failed\n"); return 1; }
     g_out = g_out_map + 54;
     {   /* 头部与像素区之间的间隙及行尾填充字节清零（本实验图片均为 0，通用性保险） */
@@ -327,8 +328,8 @@ int main(int argc, char **argv)
 
     /* 3. 并行：各线程在自己的条带上卷积（源/目的均为文件映射） */
     if (nthreads > h) nthreads = h;
-    ThreadArg *args = calloc((size_t)nthreads, sizeof(ThreadArg));
-    pthread_t *tids  = calloc((size_t)nthreads, sizeof(pthread_t));
+    ThreadArg *args = (ThreadArg *)calloc((size_t)nthreads, sizeof(ThreadArg));
+    pthread_t *tids  = (pthread_t *)calloc((size_t)nthreads, sizeof(pthread_t));
     if (!args || !tids) { fprintf(stderr,"thread allocation failed\n"); return 1; }
     int chunk = h / nthreads, rem = h % nthreads;
 
